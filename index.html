@@ -1,0 +1,5310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz for Exam 13.09.2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.5;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46;
+        }
+        .incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+        .selected {
+            background-color: #e0f2fe;
+            border-color: #38bdf8;
+        }
+        .question-nav-btn {
+            transition: all 0.2s ease-in-out;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .question-nav-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .question-nav-btn.answered-correct {
+            background-color: #bfdbfe; /* Tailwind blue-200 */
+            border-color: #60a5fa; /* Tailwind blue-400 */
+            color: #1e40af; /* Tailwind blue-800 */
+        }
+        .question-nav-btn.answered-incorrect {
+            background-color: #fecaca; /* Tailwind red-200 */
+            border-color: #f87171; /* Tailwind red-400 */
+            color: #991b1b; /* Tailwind red-900 */
+        }
+        .question-nav-btn:hover:not(.active) {
+            background-color: #f3f4f6;
+        }
+        /* Styles for Edit Mode */
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+        .edit-label {
+            font-weight: 500;
+            color: #374151;
+            margin-top: 12px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+
+    <div id="quiz-container" class="quiz-container w-full">
+        
+        <div class="text-center mb-8 relative">
+            <h1 class="text-3xl font-bold text-gray-800">Quiz for Exam 13.09.2025</h1>
+            <p id="quiz-subtitle" class="text-gray-500 mt-2">Subject:  Immunology (  60 questions)</p>
+            <p class="text-gray-500">Lecturer: Chheng Kong</p>
+            <div class="absolute top-0 left-0 flex gap-2">
+                <button id="practice-sheet-btn" class="bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200 text-sm">Practice Sheet</button>
+                <button id="show-all-btn" class="bg-green-100 text-green-700 font-semibold py-2 px-4 rounded-lg hover:bg-green-200 text-sm">Show Answers</button>
+            </div>
+            <button id="edit-quiz-btn" class="absolute top-0 right-0 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 text-sm">Edit Quiz</button>
+        </div>
+
+        <div class="text-center mb-6">
+            <div class="inline-flex rounded-md shadow-sm flex-wrap justify-center" role="group">
+                <button id="part1-btn" type="button" class="py-2 px-6 text-sm font-medium text-white bg-indigo-600 rounded-l-lg border border-gray-200 hover:bg-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-500">
+                    Part 1
+                </button>
+                <button id="part2-btn" type="button" class="py-2 px-6 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">
+                    Part 2
+                </button>
+                 <button id="part3-btn" type="button" class="py-2 px-6 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">
+                    Part 3
+                </button>
+                <button id="part4-btn" type="button" class="py-2 px-6 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">
+                    Part 4
+                </button>
+                <button id="part5-btn" type="button" class="py-2 px-6 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">
+                    Part 5
+                </button>
+                <button id="part6-btn" type="button" class="py-2 px-6 text-sm font-medium text-gray-900 bg-white rounded-r-md border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-indigo-500">
+                    Part 6
+                </button>
+            </div>
+        </div>
+
+
+        <div id="quiz-view">
+            <div class="flex justify-between items-center mb-4">
+                 <div id="main-score-text" class="text-lg font-bold text-indigo-600"></div>
+                 <button id="redo-part-btn" class="bg-orange-100 text-orange-700 font-semibold py-2 px-4 rounded-lg hover:bg-orange-200 text-sm">Redo Part</button>
+            </div>
+            <div id="question-navigation" class="flex flex-wrap justify-center gap-2 mb-6">
+                <!-- Question number buttons will be dynamically inserted here -->
+            </div>
+
+            <div id="question-area" class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="question-number" class="text-xl font-semibold text-gray-700"></h2>
+                   
+                </div>
+                <div id="question-text" class="text-lg text-gray-800 leading-relaxed"></div>
+            </div>
+
+            <div id="answer-area" class="grid grid-cols-1 md-grid-cols-2 gap-4">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+
+            <div id="feedback-area" class="mt-6 text-center text-lg font-medium"></div>
+
+            <div class="mt-6 text-center">
+                <button id="redo-btn" class="hidden bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-yellow-600 transition-colors duration-300 shadow-lg">
+                    Redo Question
+                </button>
+            </div>
+
+            <div class="mt-4 flex justify-between items-center">
+                <button id="prev-btn" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-600 transition-colors duration-300 shadow-lg hidden">
+                    <span class="font-semibold">&larr; Previous</span>
+                </button>
+                <button id="next-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg hidden ml-auto">
+                    <span class="font-semibold">Next Question</span>
+                </button>
+            </div>
+
+            <div id="results-area" class="hidden text-center">
+                <div class="mb-4">
+                    <h2 class="text-4xl font-extrabold text-gray-800">Quiz Complete!</h2>
+                </div>
+                <p id="results-score" class="text-2xl text-gray-600 mb-6"></p>
+                <div id="summary" class="text-left mt-8 bg-gray-50 p-6 rounded-lg">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-gray-700">Review Your Answers:</h3>
+                    </div>
+                </div>
+                <button id="restart-btn" class="mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg">
+                    <span class="font-semibold">Play Again</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="practice-sheet-view" class="hidden">
+            <!-- Content generated by JS -->
+        </div>
+
+        <div id="all-questions-view" class="hidden">
+            <!-- Content for showing all answers -->
+        </div>
+
+        <div id="edit-view" class="hidden">
+            <h2 class="text-2xl font-bold text-center mb-6">Edit Quiz Questions</h2>
+            <div id="edit-question-navigation" class="flex flex-wrap justify-center gap-2 mb-6">
+                <!-- Edit mode question number buttons will be dynamically inserted here -->
+            </div>
+            <div id="edit-questions-container"></div>
+            <div class="flex justify-between items-start mt-8">
+                <button id="add-question-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">Add Question</button>
+                <div>
+                    <button id="cancel-edit-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 mr-4">Cancel</button>
+                    <button id="apply-preview-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700">Apply to Preview</button>
+                    <button id="generate-save-code-btn" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 ml-4">Generate Save Code</button>
+                </div>
+            </div>
+            <div id="export-area" class="hidden mt-6 p-4 border-2 border-dashed border-purple-400 rounded-lg bg-purple-50">
+                <h3 class="text-lg font-semibold text-purple-800">How to Save Your Changes Permanently</h3>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2 mt-2">
+                    <li>All the code for your updated quiz is in the text box below.</li>
+                    <li>Click anywhere in the box to automatically copy all the code.</li>
+                    <li>Paste the copied code in a new message and send it to me.</li>
+                    <li>I will then update the file for you with your permanent changes.</li>
+                </ol>
+                <textarea id="export-output" readonly class="w-full h-64 p-2 border rounded-md bg-gray-100 font-mono text-sm focus:ring-2 focus:ring-indigo-500 mt-4 cursor-pointer"></textarea>
+                <p id="copy-feedback" class="text-purple-700 font-medium text-sm mt-2 h-4"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quizDataPart1 = [
+    {
+        "number": 1,
+        "type": "mcq",
+        "question": {
+            "en": "Which symptom is most characteristic of cardiac ischemia rather than gastrointestinal disease?"
+        },
+        "options": {
+            "en": [
+                "Burning epigastric pain after meals",
+                "Chest pain on exertion, relieved by rest",
+                "Sharp chest pain relieved by leaning forward",
+                "Right upper quadrant pain"
+            ]
+        },
+        "answer": {
+            "en": "Chest pain on exertion, relieved by rest"
+        }
+    },
+    {
+        "number": 2,
+        "type": "mcq",
+        "question": {
+            "en": "Dyspnea in heart disease is primarily due to:"
+        },
+        "options": {
+            "en": [
+                "Brain hypoperfusion",
+                "Peripheral ischemia",
+                "Pulmonary congestion and hypoxia",
+                "Gastric reflux"
+            ]
+        },
+        "answer": {
+            "en": "Pulmonary congestion and hypoxia"
+        }
+    },
+    {
+        "number": 3,
+        "type": "mcq",
+        "question": {
+            "en": "An irregularly irregular pulse is most commonly due to:"
+        },
+        "options": {
+            "en": [
+                "Atrial fibrillation",
+                "Sinus bradycardia",
+                "Mobitz II AV block",
+                "Ventricular tachycardia"
+            ]
+        },
+        "answer": {
+            "en": "Atrial fibrillation"
+        }
+    },
+    {
+        "number": 4,
+        "type": "mcq",
+        "question": {
+            "en": "A displaced apex beat may indicate:"
+        },
+        "options": {
+            "en": [
+                "Left ventricular enlargement",
+                "Right atrial enlargement",
+                "Pulmonary hypertension",
+                "Pericardial knock"
+            ]
+        },
+        "answer": {
+            "en": "Left ventricular enlargement"
+        }
+    },
+    {
+        "number": 5,
+        "type": "mcq",
+        "question": {
+            "en": "An S3 heart sound is due to:"
+        },
+        "options": {
+            "en": [
+                "Volume overload with ventricular enlargement",
+                "Pressure overload with left ventricular hypertrophy",
+                "Atrial fibrillation",
+                "Mitral regurgitation"
+            ]
+        },
+        "answer": {
+            "en": "Volume overload with ventricular enlargement"
+        }
+    },
+    {
+        "number": 6,
+        "type": "mcq",
+        "question": {
+            "en": "An S4 heart sound is due to:"
+        },
+        "options": {
+            "en": [
+                "Volume overload with left ventricular enlargement",
+                "Pressure overload with left ventricular hypertrophy",
+                "Atrial fibrillation",
+                "Mitral regurgitation"
+            ]
+        },
+        "answer": {
+            "en": "Pressure overload with left ventricular hypertrophy"
+        }
+    },
+    {
+        "number": 7,
+        "type": "mcq",
+        "question": {
+            "en": "A mid-systolic ejection murmur at the aortic area, radiating to the carotids, is typical of:"
+        },
+        "options": {
+            "en": [
+                "Mitral stenosis",
+                "Aortic stenosis",
+                "Aortic regurgitation",
+                "Tricuspid regurgitation"
+            ]
+        },
+        "answer": {
+            "en": "Aortic stenosis"
+        }
+    },
+    {
+        "number": 8,
+        "type": "mcq",
+        "question": {
+            "en": "A mid-diastolic rumbling murmur with opening snap at the apex is diagnostic of:"
+        },
+        "options": {
+            "en": [
+                "Aortic regurgitation",
+                "Mitral stenosis",
+                "Aortic stenosis",
+                "Tricuspid regurgitation"
+            ]
+        },
+        "answer": {
+            "en": "Mitral stenosis"
+        }
+    },
+    {
+        "number": 9,
+        "type": "mcq",
+        "question": {
+            "en": "An opening snap followed by a mid-diastolic murmur at the apex is typical of:"
+        },
+        "options": {
+            "en": [
+                "Mitral regurgitation",
+                "Aortic regurgitation",
+                "Mitral stenosis",
+                "Aortic stenosis"
+            ]
+        },
+        "answer": {
+            "en": "Mitral stenosis"
+        }
+    },
+    {
+        "number": 10,
+        "type": "mcq",
+        "question": {
+            "en": "A fixed wide split of the second heart sound (S2) is a hallmark of:"
+        },
+        "options": {
+            "en": [
+                "Aortic stenosis",
+                "Aortic regurgitation",
+                "Atrial septal defect (ASD)",
+                "Hypertrophic cardiomyopathy"
+            ]
+        },
+        "answer": {
+            "en": "Atrial septal defect (ASD)"
+        }
+    },
+    {
+        "number": 11,
+        "type": "mcq",
+        "question": {
+            "en": "A mid-diastolic murmur at the apex due to aortic regurgitation is called:"
+        },
+        "options": {
+            "en": [
+                "Graham-Steele murmur",
+                "Austin Flint murmur",
+                "Carey Coombs murmur",
+                "Opening snap"
+            ]
+        },
+        "answer": {
+            "en": "Austin Flint murmur"
+        }
+    },
+    {
+        "number": 12,
+        "type": "mcq",
+        "question": {
+            "en": "During palpation of the precordium, a 'thrilling' sensation is felt. This is best described as:"
+        },
+        "options": {
+            "en": [
+                "A palpable heart sound (S4)",
+                "A sustained impulse suggesting ventricular hypertrophy",
+                "A palpable murmur",
+                "A double ripple suggesting HOCM"
+            ]
+        },
+        "answer": {
+            "en": "A palpable murmur"
+        }
+    },
+    {
+        "number": 13,
+        "type": "mcq",
+        "question": {
+            "en": "Where is the best location to auscultate for the mitral valve?"
+        },
+        "options": {
+            "en": [
+                "2nd right intercostal space",
+                "2nd left intercostal space",
+                "Lower left sternal border",
+                "The apex"
+            ]
+        },
+        "answer": {
+            "en": "The apex"
+        }
+    },
+    {
+        "number": 14,
+        "type": "mcq",
+        "question": {
+            "en": "A loud S1 heart sound is most characteristic of which condition?"
+        },
+        "options": {
+            "en": [
+                "Aortic Regurgitation",
+                "Mitral Stenosis",
+                "Heart Block",
+                "Aortic Sclerosis"
+            ]
+        },
+        "answer": {
+            "en": "Mitral Stenosis"
+        }
+    },
+    {
+        "number": 15,
+        "type": "mcq",
+        "question": {
+            "en": "A pan-systolic murmur that radiates from the apex to the axilla is most suggestive of:"
+        },
+        "options": {
+            "en": [
+                "Aortic Stenosis",
+                "Mitral Regurgitation",
+                "Ventricular Septal Defect",
+                "Mitral Stenosis"
+            ]
+        },
+        "answer": {
+            "en": "Mitral Regurgitation"
+        }
+    },
+    {
+        "number": 16,
+        "type": "mcq",
+        "question": {
+            "en": "The murmur of Aortic Regurgitation is best described as:"
+        },
+        "options": {
+            "en": [
+                "A harsh ejection systolic murmur",
+                "A mid-diastolic rumble",
+                "An early diastolic blowing murmur",
+                "A pan-systolic blowing murmur"
+            ]
+        },
+        "answer": {
+            "en": "An early diastolic blowing murmur"
+        }
+    },
+    {
+        "number": 17,
+        "type": "mcq",
+        "question": {
+            "en": "The murmur of Mitral Stenosis is characterized as a:"
+        },
+        "options": {
+            "en": [
+                "Pan-systolic murmur",
+                "Ejection systolic murmur",
+                "Early diastolic murmur",
+                "Mid-diastolic rumble"
+            ]
+        },
+        "answer": {
+            "en": "Mid-diastolic rumble"
+        }
+    },
+    {
+        "number": 18,
+        "type": "mcq",
+        "question": {
+            "en": "Which of the following best defines congestive heart failure (CHF)?"
+        },
+        "options": {
+            "en": [
+                "Inability of the heart to maintain normal rhythm",
+                "Inability of the heart to meet circulatory demands under normal conditions",
+                "Permanent damage to myocardial cells",
+                "Increased preload and afterload"
+            ]
+        },
+        "answer": {
+            "en": "Inability of the heart to meet circulatory demands under normal conditions"
+        }
+    },
+    {
+        "number": 19,
+        "type": "mcq",
+        "question": {
+            "en": "Hepatojugular reflux is typically seen in:"
+        },
+        "options": {
+            "en": [
+                "Left-sided heart failure",
+                "Right-sided heart failure",
+                "Aortic regurgitation",
+                "Hypertrophic cardiomyopathy"
+            ]
+        },
+        "answer": {
+            "en": "Right-sided heart failure"
+        }
+    },
+    {
+        "number": 20,
+        "type": "mcq",
+        "question": {
+            "en": "Jugular venous distension (JVD) is a classic sign of:"
+        },
+        "options": {
+            "en": [
+                "Left-sided heart failure",
+                "Right-sided heart failure",
+                "Pulmonary embolism",
+                "Mitral valve prolapse"
+            ]
+        },
+        "answer": {
+            "en": "Right-sided heart failure"
+        }
+    },
+    {
+        "number": 21,
+        "type": "mcq",
+        "question": {
+            "en": "The most common initial symptom of left-sided heart failure is:"
+        },
+        "options": {
+            "en": [
+                "Fatigue",
+                "Dyspnea on exertion",
+                "Peripheral edema",
+                "Ascites"
+            ]
+        },
+        "answer": {
+            "en": "Dyspnea on exertion"
+        }
+    },
+    {
+        "number": 22,
+        "type": "mcq",
+        "question": {
+            "en": "Peripheral pitting edema is most commonly associated with:"
+        },
+        "options": {
+            "en": [
+                "Left-sided heart failure",
+                "Right-sided heart failure",
+                "Acute myocardial infarction",
+                "Pericarditis"
+            ]
+        },
+        "answer": {
+            "en": "Right-sided heart failure"
+        }
+    },
+    {
+        "number": 23,
+        "type": "mcq",
+        "question": {
+            "en": "Which heart sound is among the most specific findings of left-sided heart failure?"
+        },
+        "options": {
+            "en": [
+                "S1 accentuation",
+                "S2 splitting",
+                "S3 gallop",
+                "S4 gallop"
+            ]
+        },
+        "answer": {
+            "en": "S3 gallop"
+        }
+    },
+    {
+        "number": 24,
+        "type": "mcq",
+        "question": {
+            "en": "Crackles/rales at the lung bases in left-sided heart failure indicate:"
+        },
+        "options": {
+            "en": [
+                "Pleural effusion",
+                "Pulmonary fibrosis",
+                "Pulmonary edema",
+                "Asthma exacerbation"
+            ]
+        },
+        "answer": {
+            "en": "Pulmonary edema"
+        }
+    },
+    {
+        "number": 25,
+        "type": "mcq",
+        "question": {
+            "en": "Which sign suggests cardiomegaly in left-sided heart failure?"
+        },
+        "options": {
+            "en": [
+                "Right ventricular heave",
+                "Displaced point of maximal impulse (PMI)",
+                "Systolic murmur at apex",
+                "Hepatojugular reflux"
+            ]
+        },
+        "answer": {
+            "en": "Displaced point of maximal impulse (PMI)"
+        }
+    },
+    {
+        "number": 26,
+        "type": "mcq",
+        "question": {
+            "en": "Hepatomegaly with hepatojugular reflux is most consistent with:"
+        },
+        "options": {
+            "en": [
+                "Left-sided heart failure",
+                "Right-sided heart failure",
+                "Pericardial effusion",
+                "Restrictive cardiomyopathy"
+            ]
+        },
+        "answer": {
+            "en": "Right-sided heart failure"
+        }
+    },
+    {
+        "number": 27,
+        "type": "mcq",
+        "question": {
+            "en": "An S4 heart sound is best explained as:"
+        },
+        "options": {
+            "en": [
+                "Blood entering a stiff left ventricle during atrial contraction",
+                "Blood entering a dilated ventricle in early diastole",
+                "Murmur due to mitral stenosis",
+                "Valve regurgitation"
+            ]
+        },
+        "answer": {
+            "en": "Blood entering a stiff left ventricle during atrial contraction"
+        }
+    },
+    {
+        "number": 28,
+        "type": "mcq",
+        "question": {
+            "en": "Right ventricular heave is a typical sign of:"
+        },
+        "options": {
+            "en": [
+                "Right-sided heart failure",
+                "Left-sided heart failure",
+                "Aortic stenosis",
+                "Mitral regurgitation"
+            ]
+        },
+        "answer": {
+            "en": "Right-sided heart failure"
+        }
+    },
+    {
+        "number": 29,
+        "type": "mcq",
+        "question": {
+            "en": "A 65-year-old man presents with pedal edema, jugular venous distension, and hepatomegaly. These findings are most consistent with:"
+        },
+        "options": {
+            "en": [
+                "Left-sided heart failure",
+                "Right-sided heart failure",
+                "Mitral stenosis",
+                "Pulmonary embolism"
+            ]
+        },
+        "answer": {
+            "en": "Right-sided heart failure"
+        }
+    },
+    {
+        "number": 30,
+        "type": "mcq",
+        "question": {
+            "en": "Which symptom is typical of paroxysmal nocturnal dyspnea (PND) in left-sided heart failure?"
+        },
+        "options": {
+            "en": [
+                "Awakening after 1–2 hours of sleep with acute shortness of breath",
+                "Relief of dyspnea on lying flat",
+                "Persistent daytime cough",
+                "Hemoptysis during exertion"
+            ]
+        },
+        "answer": {
+            "en": "Awakening after 1–2 hours of sleep with acute shortness of breath"
+        }
+    },
+    {
+        "number": 31,
+        "type": "mcq",
+        "question": {
+            "en": "Which of the following is a feature of normal sinus rhythm on ECG?"
+        },
+        "options": {
+            "en": [
+                "P wave before every QRS",
+                "Variable PR interval",
+                "Wide QRS complex",
+                "Absent P wave"
+            ]
+        },
+        "answer": {
+            "en": "P wave before every QRS"
+        }
+    },
+    {
+        "number": 32,
+        "type": "mcq",
+        "question": {
+            "en": "In a healthy adult, the normal resting heart rate is:"
+        },
+        "options": {
+            "en": [
+                "30–50 bpm",
+                "50–60 bpm",
+                "60–100 bpm",
+                "100–120 bpm"
+            ]
+        },
+        "answer": {
+            "en": "60–100 bpm"
+        }
+    },
+    {
+        "number": 33,
+        "type": "mcq",
+        "question": {
+            "en": "ECG feature of AVNRT (AV nodal re-entrant tachycardia):"
+        },
+        "options": {
+            "en": [
+                "Delta wave present",
+                "No visible P waves or retrograde P after QRS",
+                "Wide QRS with fusion beats",
+                "Sinus P wave before each QRS"
+            ]
+        },
+        "answer": {
+            "en": "No visible P waves or retrograde P after QRS"
+        }
+    },
+    {
+        "number": 34,
+        "type": "mcq",
+        "question": {
+            "en": "In Wolff-Parkinson-White (WPW) syndrome, the ECG shows:"
+        },
+        "options": {
+            "en": [
+                "Prolonged PR interval",
+                "Delta wave and short PR interval",
+                "Inverted T waves only",
+                "Saw-tooth pattern"
+            ]
+        },
+        "answer": {
+            "en": "Delta wave and short PR interval"
+        }
+    },
+    {
+        "number": 35,
+        "type": "mcq",
+        "question": {
+            "en": "Atrial flutter on ECG is characterized by:"
+        },
+        "options": {
+            "en": [
+                "Saw-tooth flutter waves in leads II, III, aVF",
+                "Irregularly irregular rhythm",
+                "Wide QRS tachycardia",
+                "Absence of atrial activity"
+            ]
+        },
+        "answer": {
+            "en": "Saw-tooth flutter waves in leads II, III, aVF"
+        }
+    },
+    {
+        "number": 36,
+        "type": "mcq",
+        "question": {
+            "en": "Atrial fibrillation on ECG typically shows:"
+        },
+        "options": {
+            "en": [
+                "Regular rhythm with P waves",
+                "Saw-tooth waves",
+                "Irregularly irregular RR interval, no discrete P waves",
+                "Prolonged QT interval"
+            ]
+        },
+        "answer": {
+            "en": "Irregularly irregular RR interval, no discrete P waves"
+        }
+    },
+    {
+        "number": 37,
+        "type": "mcq",
+        "question": {
+            "en": "The pacemaker of the heart in normal rhythm is:"
+        },
+        "options": {
+            "en": [
+                "AV node",
+                "SA node",
+                "His bundle",
+                "Purkinje fibers"
+            ]
+        },
+        "answer": {
+            "en": "SA node"
+        }
+    },
+    {
+        "number": 38,
+        "type": "mcq",
+        "question": {
+            "en": "Which of the following is a defining characteristic of a Normal Sinus Rhythm (NSR)?"
+        },
+        "options": {
+            "en": [
+                "A variable PR interval",
+                "A heart rate between 60-100 beats per minute (bpm)",
+                "Absent P waves",
+                "A wide and bizarre QRS complex (>0.12 seconds)"
+            ]
+        },
+        "answer": {
+            "en": "A heart rate between 60-100 beats per minute (bpm)"
+        }
+    },
+    {
+        "number": 39,
+        "type": "mcq",
+        "question": {
+            "en": "In a Normal Sinus Rhythm, each QRS complex should be:"
+        },
+        "options": {
+            "en": [
+                "Preceded by an abnormal P wave with a changing morphology",
+                "Not associated with any P wave activity",
+                "Preceded by a normal P wave originating from the sinoatrial (SA) node",
+                "Followed by a P wave with a fixed delay"
+            ]
+        },
+        "answer": {
+            "en": "Preceded by a normal P wave originating from the sinoatrial (SA) node"
+        }
+    },
+    {
+        "number": 40,
+        "type": "mcq",
+        "question": {
+            "en": "A key difference between Sinus Tachycardia and Supraventricular Tachycardia (SVT) is that Sinus Tachycardia:"
+        },
+        "options": {
+            "en": [
+                "Has a wider QRS complex",
+                "Is always an irregular rhythm",
+                "Typically has visible P waves that are associated with each QRS complex",
+                "Is a life-threatening rhythm requiring immediate defibrillation"
+            ]
+        },
+        "answer": {
+            "en": "Typically has visible P waves that are associated with each QRS complex"
+        }
+    }
+];
+        let quizDataPart2 = [
+    {
+        "number": 21,
+        "type": "mcq",
+        "question": {
+            "en": "Larynx is devided in to:"
+        },
+        "options": {
+            "en": [
+                "2 regions",
+                "3 regions",
+                "4 regions",
+                "5 regions",
+                "6 regions"
+            ]
+        },
+        "answer": {
+            "en": "3 regions"
+        }
+    },
+    {
+        "number": 22,
+        "type": "mcq",
+        "question": {
+            "en": "Pharynx is divided in to:"
+        },
+        "options": {
+            "en": [
+                "2 sections",
+                "3 sections",
+                "4 sections",
+                "5 sections",
+                "6 sections"
+            ]
+        },
+        "answer": {
+            "en": "3 sections"
+        }
+    },
+    {
+        "number": 23,
+        "type": "mcq",
+        "question": {
+            "en": "What is nasopharynx ?"
+        },
+        "options": {
+            "en": [
+                "the anterior portion of the pharynx",
+                "the posterior portion of the pharynx",
+                "the middle portion of the pharynx",
+                "the lower portion of the pharynx",
+                "the upper portion of the pharynx"
+            ]
+        },
+        "answer": {
+            "en": "the upper portion of the pharynx"
+        }
+    },
+    {
+        "number": 24,
+        "type": "mcq",
+        "question": {
+            "en": "What is oropharynx ?"
+        },
+        "options": {
+            "en": [
+                "the anterior portion of the pharynx",
+                "the posterior portion of the pharynx",
+                "the middle portion of the pharynx",
+                "the lower portion of the pharynx",
+                "the upper portion of the pharynx"
+            ]
+        },
+        "answer": {
+            "en": "the middle portion of the pharynx"
+        }
+    },
+    {
+        "number": 25,
+        "type": "mcq",
+        "question": {
+            "en": "What is hypopharynx ?"
+        },
+        "options": {
+            "en": [
+                "the anterior part of the pharynx",
+                "the posterior part of the pharynx",
+                "the middle portion of the pharynx",
+                "the caudal part of the pharynx",
+                "the upper portion of the pharynx"
+            ]
+        },
+        "answer": {
+            "en": "the caudal part of the pharynx"
+        }
+    },
+    {
+        "number": 26,
+        "type": "mcq",
+        "question": {
+            "en": "Larynx is the part of the:"
+        },
+        "options": {
+            "en": [
+                "Respiratory system",
+                "Auditory system",
+                "Olfactory system",
+                "Ventilation system",
+                "Drainage system"
+            ]
+        },
+        "answer": {
+            "en": "Respiratory system"
+        }
+    },
+    {
+        "number": 27,
+        "type": "mcq",
+        "question": {
+            "en": "Where is the supraglottis ?"
+        },
+        "options": {
+            "en": [
+                "the top of the larynx",
+                "the base of the larynx",
+                "the top of the pharynx",
+                "the base of the pharynx",
+                "the middle of the larynx"
+            ]
+        },
+        "answer": {
+            "en": "the top of the larynx"
+        }
+    },
+    {
+        "number": 28,
+        "type": "mcq",
+        "question": {
+            "en": "Where is the glottis?"
+        },
+        "options": {
+            "en": [
+                "the middle part of the pharynx",
+                "the middle part of the larynx",
+                "the middle part of the ear",
+                "the middle part of the nose",
+                "the middle part of the nasal cavity"
+            ]
+        },
+        "answer": {
+            "en": "the middle part of the larynx"
+        }
+    },
+    {
+        "number": 29,
+        "type": "mcq",
+        "question": {
+            "en": "Where is the subglottis?"
+        },
+        "options": {
+            "en": [
+                "At the middle of the larynx",
+                "At the top of the pharynx",
+                "At the top of the larynx",
+                "At the bottom of the larynx",
+                "At the bottom of the pharynx"
+            ]
+        },
+        "answer": {
+            "en": "At the bottom of the larynx"
+        }
+    },
+    {
+        "number": 30,
+        "type": "mcq",
+        "question": {
+            "en": "The larynx commonly called"
+        },
+        "options": {
+            "en": [
+                "The voice box",
+                "The hearing system",
+                "The olfactory system",
+                "The balance system",
+                "The respiratory system"
+            ]
+        },
+        "answer": {
+            "en": "The voice box"
+        }
+    },
+    {
+        "number": 31,
+        "type": "mcq",
+        "question": {
+            "en": "Semiology is the study of:"
+        },
+        "options": {
+            "en": [
+                "Signs",
+                "Symptoms",
+                "Signs of pharynx",
+                "Signs of larynx",
+                "Signs and symptoms"
+            ]
+        },
+        "answer": {
+            "en": "Signs and symptoms"
+        }
+    },
+    {
+        "number": 32,
+        "type": "mcq",
+        "question": {
+            "en": "Semiology of the ear is:"
+        },
+        "options": {
+            "en": [
+                "The study of symptoms of the ear",
+                "The study of signs of the ear",
+                "The study of signs and symptoms of the ear",
+                "The study of the ear",
+                "The study of semiology of the ear"
+            ]
+        },
+        "answer": {
+            "en": "The study of signs and symptoms of the ear"
+        }
+    },
+    {
+        "number": 33,
+        "type": "mcq",
+        "question": {
+            "en": "Semiology of the pharynx is:"
+        },
+        "options": {
+            "en": [
+                "The study of symptoms of the pharynx",
+                "The study of signs of the pharynx",
+                "The study of signs and symptoms of the pharynx",
+                "The study of the pharynx",
+                "The study of semiology of the pharynx"
+            ]
+        },
+        "answer": {
+            "en": "The study of signs and symptoms of the pharynx"
+        }
+    },
+    {
+        "number": 34,
+        "type": "mcq",
+        "question": {
+            "en": "Semiology of the larynx is:"
+        },
+        "options": {
+            "en": [
+                "The study of symptoms of the larynx",
+                "The study of signs of the larynx",
+                "The study of signs and symptoms of the larynx",
+                "The study of the larynx",
+                "The study of semiology of the larynx"
+            ]
+        },
+        "answer": {
+            "en": "The study of signs and symptoms of the larynx"
+        }
+    },
+    {
+        "number": 35,
+        "type": "mcq",
+        "question": {
+            "en": "The ear is the organ that detects:"
+        },
+        "options": {
+            "en": [
+                "Feeling",
+                "Sound",
+                "Air",
+                "Water",
+                "Voice and air"
+            ]
+        },
+        "answer": {
+            "en": "Sound"
+        }
+    },
+    {
+        "number": 36,
+        "type": "mcq",
+        "question": {
+            "en": "The ear divides in:"
+        },
+        "options": {
+            "en": [
+                "5 parts",
+                "4 parts",
+                "2 parts",
+                "3 parts",
+                "6 parts"
+            ]
+        },
+        "answer": {
+            "en": "3 parts"
+        }
+    },
+    {
+        "number": 37,
+        "type": "mcq",
+        "question": {
+            "en": "What is the outer ear?"
+        },
+        "options": {
+            "en": [
+                "the most internal portion of the ear",
+                "the middle portion of the ear",
+                "the upper portion of the ear",
+                "the lower portion of the ear",
+                "the most external portion of the ear"
+            ]
+        },
+        "answer": {
+            "en": "the most external portion of the ear"
+        }
+    },
+    {
+        "number": 38,
+        "type": "mcq",
+        "question": {
+            "en": "What is the middle ear?"
+        },
+        "options": {
+            "en": [
+                "An air-filled cavity below the tympanic membrane",
+                "An air-filled cavity upper the tympanic membrane",
+                "An air-filled cavity in the tympanic membrane",
+                "An air-filled cavity behind the tympanic membrane",
+                "An air-filled cavity under the tympanic membrane"
+            ]
+        },
+        "answer": {
+            "en": "An air-filled cavity behind the tympanic membrane"
+        }
+    },
+    {
+        "number": 39,
+        "type": "mcq",
+        "question": {
+            "en": "What is the inner ear?"
+        },
+        "options": {
+            "en": [
+                "This contains the sensory organs for balance and feeling",
+                "This contains the sensory organs for balance and hearing",
+                "This contains the sensory organs for hearing and motion",
+                "This contains the sensory organs for balance and motion",
+                "This contains the sensory organs for feeling and motion"
+            ]
+        },
+        "answer": {
+            "en": "This contains the sensory organs for balance and hearing"
+        }
+    },
+    {
+        "number": 40,
+        "type": "mcq",
+        "question": {
+            "en": "How many ossicles?"
+        },
+        "options": {
+            "en": [
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+            ]
+        },
+        "answer": {
+            "en": "3"
+        }
+    },
+    {
+        "number": 41,
+        "type": "mcq",
+        "question": {
+            "en": "What is throat clearing?"
+        },
+        "options": {
+            "en": [
+                "It is a sound made at the back of the throat",
+                "It is a sound made at the top of the throat",
+                "It is a sound made at the top of the nose",
+                "It is a sound made at the back of the nose",
+                "It is a sound made at the top of the nasal cavity"
+            ]
+        },
+        "answer": {
+            "en": "It is a sound made at the back of the throat"
+        }
+    },
+    {
+        "number": 42,
+        "type": "mcq",
+        "question": {
+            "en": "Throat clearing may be caused by infectious disorders except:"
+        },
+        "options": {
+            "en": [
+                "Sinusitis",
+                "Strep throat",
+                "Tonsillitis",
+                "Laryngitis",
+                "Otitis"
+            ]
+        },
+        "answer": {
+            "en": "Otitis"
+        }
+    },
+    {
+        "number": 43,
+        "type": "mcq",
+        "question": {
+            "en": "The nose consists of:"
+        },
+        "options": {
+            "en": [
+                "Internal nose and nasal cavity",
+                "External nose and nasopharynx",
+                "External nose and nasal cavity",
+                "External nose and oropharynx",
+                "Internal nose and nasopharynx"
+            ]
+        },
+        "answer": {
+            "en": "External nose and nasal cavity"
+        }
+    },
+    {
+        "number": 44,
+        "type": "mcq",
+        "question": {
+            "en": "External nose has two elliptical orifices call:"
+        },
+        "options": {
+            "en": [
+                "Nasal septum",
+                "Naris",
+                "Nasal cavity",
+                "Ala nasi",
+                "Philtrum"
+            ]
+        },
+        "answer": {
+            "en": "Naris"
+        }
+    },
+    {
+        "number": 45,
+        "type": "mcq",
+        "question": {
+            "en": "What is in the floor of nasal cavity?"
+        },
+        "options": {
+            "en": [
+                "Nasal septum",
+                "Frontal sinus",
+                "Nasal bone",
+                "Palatine process maxilla",
+                "Vomer"
+            ]
+        },
+        "answer": {
+            "en": "Palatine process maxilla"
+        }
+    },
+    {
+        "number": 46,
+        "type": "mcq",
+        "question": {
+            "en": "What is in the roof of nasal cavity?"
+        },
+        "options": {
+            "en": [
+                "Nasal septum",
+                "Frontal bone",
+                "Ala nasi",
+                "Palatine process maxilla",
+                "Vomer"
+            ]
+        },
+        "answer": {
+            "en": "Frontal bone"
+        }
+    },
+    {
+        "number": 47,
+        "type": "mcq",
+        "question": {
+            "en": "What is in medial wall of nasal cavity?"
+        },
+        "options": {
+            "en": [
+                "Nasal septum",
+                "Frontal sinus",
+                "Rhinopharynx",
+                "Palatine process maxilla",
+                "Oropharynx"
+            ]
+        },
+        "answer": {
+            "en": "Nasal septum"
+        }
+    },
+    {
+        "number": 48,
+        "type": "mcq",
+        "question": {
+            "en": "What is in the lateral wall of nasal cavity?"
+        },
+        "options": {
+            "en": [
+                "Nasal septum",
+                "Frontal sinus",
+                "Concha",
+                "Palatine process maxilla",
+                "Oropharynx"
+            ]
+        },
+        "answer": {
+            "en": "Concha"
+        }
+    },
+    {
+        "number": 49,
+        "type": "mcq",
+        "question": {
+            "en": "These are the function of the nose except:"
+        },
+        "options": {
+            "en": [
+                "Respiration",
+                "Air conditioning",
+                "Protection of lower airway",
+                "Ventilation and drainage of paranasal sinuses",
+                "Balance"
+            ]
+        },
+        "answer": {
+            "en": "Balance"
+        }
+    },
+    {
+        "number": 50,
+        "type": "mcq",
+        "question": {
+            "en": "What is rhinorrhea ?"
+        },
+        "options": {
+            "en": [
+                "An over-sensitivity to certain frequency and volume ranges of sound",
+                "Free discharge of a thin nasal mucus fluid",
+                "Drainage of liquid from the ear",
+                "A sensation of spinning while stationary",
+                "A partial or total inability to hear"
+            ]
+        },
+        "answer": {
+            "en": "Free discharge of a thin nasal mucus fluid"
+        }
+    },
+    {
+        "number": 51,
+        "type": "mcq",
+        "question": {
+            "en": "What is cause of rhinorrhea?"
+        },
+        "options": {
+            "en": [
+                "Cold temperature",
+                "Otitis",
+                "Stomatitis",
+                "Laryngitis",
+                "Hot temperature"
+            ]
+        },
+        "answer": {
+            "en": "Cold temperature"
+        }
+    },
+    {
+        "number": 52,
+        "type": "mcq",
+        "question": {
+            "en": "What is nasal obstruction?"
+        },
+        "options": {
+            "en": [
+                "Free discharge of a thin nasal mucus fluid",
+                "Sensation of insufficient airflow through the nose",
+                "Drainage of liquid from the ear",
+                "A sensation of spinning while stationary",
+                "A partial or total inability to hear"
+            ]
+        },
+        "answer": {
+            "en": "Sensation of insufficient airflow through the nose"
+        }
+    },
+    {
+        "number": 53,
+        "type": "mcq",
+        "question": {
+            "en": "These are symptoms of nasal obstruction except:"
+        },
+        "options": {
+            "en": [
+                "Postnasal discharge",
+                "Inability to smell",
+                "Sneezing",
+                "Headache",
+                "Otalgia"
+            ]
+        },
+        "answer": {
+            "en": "Otalgia"
+        }
+    },
+    {
+        "number": 54,
+        "type": "mcq",
+        "question": {
+            "en": "What is anosmia ?"
+        },
+        "options": {
+            "en": [
+                "A partial or total inability to hear",
+                "The hearing of sound when no external sound is present",
+                "The loss of the ability to detect the sound",
+                "The loss of the ability to detect one or more smells",
+                "Free discharge of a thin nasal mucus fluid"
+            ]
+        },
+        "answer": {
+            "en": "The loss of the ability to detect one or more smells"
+        }
+    },
+    {
+        "number": 55,
+        "type": "mcq",
+        "question": {
+            "en": "What is the cause of anosmia?"
+        },
+        "options": {
+            "en": [
+                "Pharyngitis",
+                "Nasal polyps",
+                "Otitis media",
+                "Infection",
+                "Laryngitis"
+            ]
+        },
+        "answer": {
+            "en": "Nasal polyps"
+        }
+    },
+    {
+        "number": 56,
+        "type": "mcq",
+        "question": {
+            "en": "What is post nasal drip?"
+        },
+        "options": {
+            "en": [
+                "Excess mucus accumulates in the back of the throat",
+                "Excess mucus accumulates in the nasopharynx",
+                "Excess mucus accumulates in the nasal cavity",
+                "Excess mucus accumulates in the nose",
+                "Excess mucus accumulates in the back of the nose and it drips down the back of the throat"
+            ]
+        },
+        "answer": {
+            "en": "Excess mucus accumulates in the back of the nose and it drips down the back of the throat"
+        }
+    },
+    {
+        "number": 57,
+        "type": "mcq",
+        "question": {
+            "en": "Post- nasal drip can be caused by:"
+        },
+        "options": {
+            "en": [
+                "Tabac",
+                "Alcool",
+                "Allergy",
+                "Pollen",
+                "Dust"
+            ]
+        },
+        "answer": {
+            "en": "Allergy"
+        }
+    },
+    {
+        "number": 58,
+        "type": "mcq",
+        "question": {
+            "en": "What is a sneeze?"
+        },
+        "options": {
+            "en": [
+                "Convulsive expulsion of air from the lungs",
+                "Convulsive expulsion of air from the lungs through the nose and mouth",
+                "Convulsive expulsion of water from the lungs through the nose and mouth",
+                "Convulsive expulsion of air from nose and mouth",
+                "Convulsive expulsion of air from the mouth"
+            ]
+        },
+        "answer": {
+            "en": "Convulsive expulsion of air from the lungs through the nose and mouth"
+        }
+    },
+    {
+        "number": 59,
+        "type": "mcq",
+        "question": {
+            "en": "Proven methods to reduce sneezing except:"
+        },
+        "options": {
+            "en": [
+                "Keeping pets out of the house",
+                "Removal of dirt and dust particles",
+                "Replacing filters for air filtration devices and humidifiers",
+                "Staying away from industrial and agricultural zones",
+                "Do exercise"
+            ]
+        },
+        "answer": {
+            "en": "Do exercise"
+        }
+    },
+    {
+        "number": 60,
+        "type": "mcq",
+        "question": {
+            "en": "What is Epistaxis?"
+        },
+        "options": {
+            "en": [
+                "Bleeding from the nose",
+                "Bleeding from the mouth",
+                "Bleeding from the nose and mouth",
+                "Bleeding from the nasopharynx",
+                "Bleeding from the nose and oropharynx"
+            ]
+        },
+        "answer": {
+            "en": "Bleeding from the nose"
+        }
+    },
+    {
+        "number": 61,
+        "type": "mcq",
+        "question": {
+            "en": "Risk factors of epistaxis include:"
+        },
+        "options": {
+            "en": [
+                "Trauma",
+                "Low blood pressure",
+                "Tabac",
+                "Allergic rhinitis",
+                "Cold weather"
+            ]
+        },
+        "answer": {
+            "en": "Trauma"
+        }
+    },
+    {
+        "number": 62,
+        "type": "mcq",
+        "question": {
+            "en": "Visceral compartment of the neck is:"
+        },
+        "options": {
+            "en": [
+                "Eye",
+                "Oesophagus",
+                "Nose",
+                "Trachea",
+                "Mouth"
+            ]
+        },
+        "answer": {
+            "en": "Trachea"
+        }
+    },
+    {
+        "number": 63,
+        "type": "mcq",
+        "question": {
+            "en": "How many major neck triangles?"
+        },
+        "options": {
+            "en": [
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+            ]
+        },
+        "answer": {
+            "en": "2"
+        }
+    },
+    {
+        "number": 64,
+        "type": "mcq",
+        "question": {
+            "en": "These are anterior triangle except:"
+        },
+        "options": {
+            "en": [
+                "Submental triangle",
+                "Submandibular triangle",
+                "Carotid triangle",
+                "Muscular triangle",
+                "Ocipital triangle"
+            ]
+        },
+        "answer": {
+            "en": "Ocipital triangle"
+        }
+    },
+    {
+        "number": 65,
+        "type": "mcq",
+        "question": {
+            "en": "It is a posterior triangle:"
+        },
+        "options": {
+            "en": [
+                "Submental triangle",
+                "Submandibular triangle",
+                "Carotid triangle",
+                "Subclavian triangle",
+                "Muscular triangle"
+            ]
+        },
+        "answer": {
+            "en": "Subclavian triangle"
+        }
+    },
+    {
+        "number": 66,
+        "type": "mcq",
+        "question": {
+            "en": "What is the function of the neck?"
+        },
+        "options": {
+            "en": [
+                "The neck supports the weight of the head and body",
+                "The neck supports the body",
+                "The neck supports the weight of the body",
+                "The neck supports the head",
+                "The neck supports the weight of the head"
+            ]
+        },
+        "answer": {
+            "en": "The neck supports the weight of the head"
+        }
+    },
+    {
+        "number": 67,
+        "type": "mcq",
+        "question": {
+            "en": "What is neck pain?"
+        },
+        "options": {
+            "en": [
+                "Pain that starts in the neck with radiating pain down to the body",
+                "Pain that starts in the neck with radiating pain down one or both of the arms",
+                "Pain that starts in the head with radiating pain to the neck",
+                "Pain that starts in the head with radiating pain to the body",
+                "Pain in the neck and head"
+            ]
+        },
+        "answer": {
+            "en": "Pain that starts in the neck with radiating pain down one or both of the arms"
+        }
+    },
+    {
+        "number": 68,
+        "type": "mcq",
+        "question": {
+            "en": "These are the causes of neck pain except:"
+        },
+        "options": {
+            "en": [
+                "Muscle strains",
+                "Worn joints",
+                "Nerve compression",
+                "Injuries",
+                "Sinusitis"
+            ]
+        },
+        "answer": {
+            "en": "Sinusitis"
+        }
+    },
+    {
+        "number": 69,
+        "type": "mcq",
+        "question": {
+            "en": "What is neck swelling?"
+        },
+        "options": {
+            "en": [
+                "An accumulation of fluid in the neck tissues",
+                "An accumulation of air in the neck tissues",
+                "Swelling in the neck",
+                "Swelling in the head",
+                "Swelling in the head and neck"
+            ]
+        },
+        "answer": {
+            "en": "An accumulation of fluid in the neck tissues"
+        }
+    },
+    {
+        "number": 70,
+        "type": "mcq",
+        "question": {
+            "en": "Neck swelling can be caused by:"
+        },
+        "options": {
+            "en": [
+                "Rhinitis",
+                "Sinusitis",
+                "Otitis media",
+                "General infection leading to swollen lymph nodes",
+                "Pharyngitis"
+            ]
+        },
+        "answer": {
+            "en": "General infection leading to swollen lymph nodes"
+        }
+    },
+    {
+        "number": 71,
+        "type": "mcq",
+        "question": {
+            "en": "What is neck mass?"
+        },
+        "options": {
+            "en": [
+                "Is an abnormal lump in the head and neck",
+                "Is a normal lump in the head",
+                "Is an abnormal lump in the head",
+                "Is a normal lump in the neck",
+                "Is an abnormal lump in the neck"
+            ]
+        },
+        "answer": {
+            "en": "Is an abnormal lump in the neck"
+        }
+    },
+    {
+        "number": 72,
+        "type": "mcq",
+        "question": {
+            "en": "These are the cause of neck mass except:"
+        },
+        "options": {
+            "en": [
+                "Infectious mononucleosis",
+                "Thyroid nodules",
+                "Branchial cleft cyst",
+                "Non-Hodgkin’s lymphoma",
+                "Lymph node"
+            ]
+        },
+        "answer": {
+            "en": "Lymph node"
+        }
+    },
+    {
+        "number": 73,
+        "type": "mcq",
+        "question": {
+            "en": "Cause of stiff neck is:"
+        },
+        "options": {
+            "en": [
+                "Poor posture",
+                "Lymph node",
+                "Surgery",
+                "Infection",
+                "Goiter"
+            ]
+        },
+        "answer": {
+            "en": "Poor posture"
+        }
+    },
+    {
+        "number": 1,
+        "type": "mcq",
+        "question": {
+            "en": "What is the hearing loss?"
+        },
+        "options": {
+            "en": [
+                "An over-sensitivity to certain frequency and volume ranges of sound",
+                "Pain in the ear",
+                "Drainage of liquid from the ear",
+                "A sensation of spinning while stationary",
+                "A partial or total inability to hear"
+            ]
+        },
+        "answer": {
+            "en": "A partial or total inability to hear"
+        }
+    },
+    {
+        "number": 2,
+        "type": "mcq",
+        "question": {
+            "en": "What is the hyperacussis?"
+        },
+        "options": {
+            "en": [
+                "Pain in the ear",
+                "A partial or total inability to hear",
+                "An over-sensitivity to certain frequency and volume ranges of sound",
+                "Drainage of liquid from the ear",
+                "Ability to hear"
+            ]
+        },
+        "answer": {
+            "en": "An over-sensitivity to certain frequency and volume ranges of sound"
+        }
+    },
+    {
+        "number": 3,
+        "type": "mcq",
+        "question": {
+            "en": "What is the otalgia?"
+        },
+        "options": {
+            "en": [
+                "Pain in the ear",
+                "The hearing of sound when no external sound is present",
+                "Drainage of liquid from the ear",
+                "A sensation of spinning while stationary",
+                "Pain in the neck"
+            ]
+        },
+        "answer": {
+            "en": "Pain in the ear"
+        }
+    },
+    {
+        "number": 4,
+        "type": "mcq",
+        "question": {
+            "en": "What is the otorrhea?"
+        },
+        "options": {
+            "en": [
+                "A partial or total inability to hear",
+                "Drainage of liquid from the ear",
+                "An over-sensitivity to certain frequency and volume ranges of sound",
+                "Pain anywhere in the region of the head or neck.",
+                "Drainage of liquid from the nose"
+            ]
+        },
+        "answer": {
+            "en": "Drainage of liquid from the ear"
+        }
+    },
+    {
+        "number": 5,
+        "type": "mcq",
+        "question": {
+            "en": "What is the tinnitus?"
+        },
+        "options": {
+            "en": [
+                "Pain anywhere in the region of the head or neck",
+                "Drainage of liquid from the ear",
+                "A partial or total inability to hear",
+                "The hearing of sound when no external sound is present",
+                "Ability to hear the voice"
+            ]
+        },
+        "answer": {
+            "en": "The hearing of sound when no external sound is present"
+        }
+    },
+    {
+        "number": 6,
+        "type": "mcq",
+        "question": {
+            "en": "What is the vertigo?"
+        },
+        "options": {
+            "en": [
+                "A sensation of spinning while stationary",
+                "A partial or total inability to hear",
+                "Forceful expulsion of the contents of one's stomach through the mouth and the nose",
+                "Pain in the head",
+                "Drainage of liquid from the ear"
+            ]
+        },
+        "answer": {
+            "en": "A sensation of spinning while stationary"
+        }
+    },
+    {
+        "number": 7,
+        "type": "mcq",
+        "question": {
+            "en": "What is cephalalgia?"
+        },
+        "options": {
+            "en": [
+                "A transient abnormal enlargement of a body part or area",
+                "Pain anywhere in the region of the head or neck",
+                "Drainage of liquid from the ear",
+                "Pain in the ear",
+                "A sensation of spinning while stationary"
+            ]
+        },
+        "answer": {
+            "en": "Pain anywhere in the region of the head or neck"
+        }
+    },
+    {
+        "number": 8,
+        "type": "mcq",
+        "question": {
+            "en": "What is the tumefaction?"
+        },
+        "options": {
+            "en": [
+                "The hearing of sound when no external sound is present",
+                "A transient abnormal enlargement of a body part or area",
+                "Pain in the ear",
+                "Drainage of liquid from the ear",
+                "Drainage of liquid from the nose"
+            ]
+        },
+        "answer": {
+            "en": "A transient abnormal enlargement of a body part or area"
+        }
+    },
+    {
+        "number": 9,
+        "type": "mcq",
+        "question": {
+            "en": "What is pruritus?"
+        },
+        "options": {
+            "en": [
+                "It is a sensation that causes the desire or reflex to scratch",
+                "Drainage of liquid from the ear",
+                "It is a sensation that causes the desire or reflex to vomit",
+                "A sensation of spinning while stationary",
+                "A partial or total inability to hear"
+            ]
+        },
+        "answer": {
+            "en": "It is a sensation that causes the desire or reflex to scratch"
+        }
+    },
+    {
+        "number": 10,
+        "type": "mcq",
+        "question": {
+            "en": "Pharynx is part of the throat and situate:"
+        },
+        "options": {
+            "en": [
+                "Posterior to the nasal cavity",
+                "Anterior to the nasal cavity",
+                "Inferior to the esophagus",
+                "Inferior to the larynx",
+                "Anterior to the mouth"
+            ]
+        },
+        "answer": {
+            "en": "Posterior to the nasal cavity"
+        }
+    },
+    {
+        "number": 11,
+        "type": "mcq",
+        "question": {
+            "en": "What is the function of pharynx?"
+        },
+        "options": {
+            "en": [
+                "Audition",
+                "Ventilation",
+                "Olfaction",
+                "Deglutition",
+                "Drainage"
+            ]
+        },
+        "answer": {
+            "en": "Deglutition"
+        }
+    },
+    {
+        "number": 12,
+        "type": "mcq",
+        "question": {
+            "en": "What is the function of the larynx?"
+        },
+        "options": {
+            "en": [
+                "Protection",
+                "Respiration",
+                "Olfaction",
+                "Audition",
+                "Drainage"
+            ]
+        },
+        "answer": {
+            "en": "Respiration"
+        }
+    },
+    {
+        "number": 13,
+        "type": "mcq",
+        "question": {
+            "en": "What is the dysphagia?"
+        },
+        "options": {
+            "en": [
+                "Painful swallowing in the mouth or oesophagus",
+                "Disorders of the voice",
+                "Shortness of breath",
+                "Sensation that suggests difficulty in the passage of solids or liquids from the mouth to the stomach",
+                "Painful in the ear"
+            ]
+        },
+        "answer": {
+            "en": "Sensation that suggests difficulty in the passage of solids or liquids from the mouth to the stomach"
+        }
+    },
+    {
+        "number": 14,
+        "type": "mcq",
+        "question": {
+            "en": "What is the dysphonia?"
+        },
+        "options": {
+            "en": [
+                "The impairment in the ability to produce voice sounds using the vocal organs",
+                "Shortness of breath",
+                "Pain or irritation of the throat",
+                "Sensation that causes the desire or reflex to scratch",
+                "Ability to produce sound"
+            ]
+        },
+        "answer": {
+            "en": "The impairment in the ability to produce voice sounds using the vocal organs"
+        }
+    },
+    {
+        "number": 15,
+        "type": "mcq",
+        "question": {
+            "en": "What is the dyspnea?"
+        },
+        "options": {
+            "en": [
+                "Difficulty making sounds when trying to speak",
+                "The feeling associated with impaired breathing",
+                "Painful swallowing in the mouth or oesophagus",
+                "Disorders of the voice",
+                "Pain in the throat"
+            ]
+        },
+        "answer": {
+            "en": "The feeling associated with impaired breathing"
+        }
+    },
+    {
+        "number": 16,
+        "type": "mcq",
+        "question": {
+            "en": "What is the hoarseness?"
+        },
+        "options": {
+            "en": [
+                "Difficulty making sounds when trying to speak.",
+                "Pain or irritation of the throat",
+                "Sudden and often repetitively occurring reflex which helps to clear the large breathing",
+                "Sensation of unease and discomfort in the upper stomach with an involuntary urge to vomit",
+                "Pain in the head"
+            ]
+        },
+        "answer": {
+            "en": "Difficulty making sounds when trying to speak."
+        }
+    },
+    {
+        "number": 17,
+        "type": "mcq",
+        "question": {
+            "en": "What is the sore throat?"
+        },
+        "options": {
+            "en": [
+                "The impairment in the ability to produce voice sounds using the vocal organs",
+                "Sensation of unease and discomfort in the upper stomach with an involuntary urge to vomit",
+                "Sudden and often repetitively occurring reflex which helps to clear the large breathing",
+                "Pain or irritation of the throat that often worsens when you swallow",
+                "Pain in the neck"
+            ]
+        },
+        "answer": {
+            "en": "Pain or irritation of the throat that often worsens when you swallow"
+        }
+    },
+    {
+        "number": 18,
+        "type": "mcq",
+        "question": {
+            "en": "What is emesis?"
+        },
+        "options": {
+            "en": [
+                "Shortness of breath",
+                "Sensation of unease and discomfort in the upper stomach with an involuntary urge to vomit",
+                "Ability to produce sound",
+                "forceful expulsion of the contents of one's stomach through the mouth and sometimes the nose",
+                "A transient abnormal enlargement of a body part or area"
+            ]
+        },
+        "answer": {
+            "en": "forceful expulsion of the contents of one's stomach through the mouth and sometimes the nose"
+        }
+    },
+    {
+        "number": 19,
+        "type": "mcq",
+        "question": {
+            "en": "What is odynophagia?"
+        },
+        "options": {
+            "en": [
+                "Pain in the larynx",
+                "Painful swallowing in the mouth (oropharynx) or oesophagus",
+                "Disorders of the voice",
+                "Sensation that causes the desire or reflex to scratch",
+                "Pain or irritation of the throat that often worsens when you swallow"
+            ]
+        },
+        "answer": {
+            "en": "Painful swallowing in the mouth (oropharynx) or oesophagus"
+        }
+    },
+    {
+        "number": 20,
+        "type": "mcq",
+        "question": {
+            "en": "What is odynophagia?"
+        },
+        "options": {
+            "en": [
+                "Pain in the larynx",
+                "Painful swallowing in the mouth (oropharynx) or oesophagus",
+                "Disorders of the voice",
+                "Sensation that causes the desire or reflex to scratch",
+                "Pain or irritation of the throat that often worsens when you swallow"
+            ]
+        },
+        "answer": {
+            "en": "Painful swallowing in the mouth (oropharynx) or oesophagus"
+        }
+    }
+];
+        const quizDataPart3 = [
+    {
+        "number": 1,
+        "type": "mcq",
+        "question": {
+            "en": "The respiratory system are :"
+        },
+        "options": {
+            "en": [
+                "body’s digestive system",
+                "body’s urinary system",
+                "body’s breathing system"
+            ]
+        },
+        "answer": {
+            "en": "body’s breathing system"
+        }
+    },
+    {
+        "number": 2,
+        "type": "mcq",
+        "question": {
+            "en": "Oesophagus and gullet are :"
+        },
+        "options": {
+            "en": [
+                "way of airflow into the body and travel to the digestive system",
+                "way of airflow into the body and travel to the lungs",
+                "way of airflow into the body and travel to the heart"
+            ]
+        },
+        "answer": {
+            "en": "way of airflow into the body and travel to the digestive system"
+        }
+    },
+    {
+        "number": 3,
+        "type": "mcq",
+        "question": {
+            "en": "Another name for the windpipe are :"
+        },
+        "options": {
+            "en": [
+                "oesophagus",
+                "trachea",
+                "bronchi"
+            ]
+        },
+        "answer": {
+            "en": "trachea"
+        }
+    },
+    {
+        "number": 4,
+        "type": "mcq",
+        "question": {
+            "en": "Branches in two directions (left main bronchus and right main bronchus) is :"
+        },
+        "options": {
+            "en": [
+                "bifurcation of the trachea",
+                "bifurcation of left main bronchus",
+                "bifurcation of right main bronchus"
+            ]
+        },
+        "answer": {
+            "en": "bifurcation of the trachea"
+        }
+    },
+    {
+        "number": 5,
+        "type": "mcq",
+        "question": {
+            "en": "Definition of cough is :"
+        },
+        "options": {
+            "en": [
+                "subjective respiratory discomfort feeling by the patient and causing visible changes in ventilation.",
+                "reflex act, neurogenic and act of Defense.",
+                "ការធ្លាក់ឈាមតាមមាត់មានប្រភពពីផ្លូវដង្ហើមចាប់ពីsub-glottal."
+            ]
+        },
+        "answer": {
+            "en": "reflex act, neurogenic and act of Defense."
+        }
+    },
+    {
+        "number": 6,
+        "type": "mcq",
+        "question": {
+            "en": "The definition of the sputum is :"
+        },
+        "options": {
+            "en": [
+                "abnormal secretion from patient digestive system.",
+                "abnormal secretion from patient vascular system.",
+                "abnormal secretion from patient respiratory system."
+            ]
+        },
+        "answer": {
+            "en": "abnormal secretion from patient respiratory system."
+        }
+    },
+    {
+        "number": 7,
+        "type": "mcq",
+        "question": {
+            "en": "Digestive bleeding and airway bleeding are :"
+        },
+        "options": {
+            "en": [
+                "Ematemesis, melena",
+                "gingival hemorrhage",
+                "Ematemesis, melena complicated by swallowed hemoptysis"
+            ]
+        },
+        "answer": {
+            "en": "Ematemesis, melena complicated by swallowed hemoptysis"
+        }
+    },
+    {
+        "number": 8,
+        "type": "mcq",
+        "question": {
+            "en": "Fungi, chronic bronchitis can develop :"
+        },
+        "options": {
+            "en": [
+                "hemoptysis.",
+                "epistaxis",
+                "subcutaneous bleeding"
+            ]
+        },
+        "answer": {
+            "en": "hemoptysis."
+        }
+    },
+    {
+        "number": 9,
+        "type": "mcq",
+        "question": {
+            "en": "Epistaxis, blood sialorrhea and hemoptysis are :"
+        },
+        "options": {
+            "en": [
+                "identical sense",
+                "different sense",
+                "localized hemorrhage"
+            ]
+        },
+        "answer": {
+            "en": "different sense"
+        }
+    },
+    {
+        "number": 10,
+        "type": "mcq",
+        "question": {
+            "en": "In adult, respiration rate considered as tachypnea is :"
+        },
+        "options": {
+            "en": [
+                "respiration rate of >20cycles/min",
+                "respiration rate of less than < 20cycles/min",
+                "respiration rate of equal = 20cycles/min"
+            ]
+        },
+        "answer": {
+            "en": "respiration rate of >20cycles/min"
+        }
+    },
+    {
+        "number": 11,
+        "type": "mcq",
+        "question": {
+            "en": "Frequency of respiration in adult normal is :"
+        },
+        "options": {
+            "en": [
+                "12-16 cycles/minute",
+                "25 cycles/minute",
+                "less than <12 cycles/minute"
+            ]
+        },
+        "answer": {
+            "en": "12-16 cycles/minute"
+        }
+    },
+    {
+        "number": 12,
+        "type": "mcq",
+        "question": {
+            "en": "In children normal, frequency of respiration is :"
+        },
+        "options": {
+            "en": [
+                "24-40 cycles/minute",
+                "more than> 40 cycles/minute",
+                "more than> 50 cycles/minute"
+            ]
+        },
+        "answer": {
+            "en": "24-40 cycles/minute"
+        }
+    },
+    {
+        "number": 13,
+        "type": "mcq",
+        "question": {
+            "en": "Body structure protects the lungs from outside harm is :"
+        },
+        "options": {
+            "en": [
+                "arms",
+                "rib cage",
+                "abdomen"
+            ]
+        },
+        "answer": {
+            "en": "rib cage"
+        }
+    },
+    {
+        "number": 14,
+        "type": "mcq",
+        "question": {
+            "en": "On living, the body’s cells need especially :"
+        },
+        "options": {
+            "en": [
+                "food",
+                "water",
+                "oxygen"
+            ]
+        },
+        "answer": {
+            "en": "oxygen"
+        }
+    },
+    {
+        "number": 15,
+        "type": "mcq",
+        "question": {
+            "en": "Oxygen moves from the lungs into the bloodstream through :"
+        },
+        "options": {
+            "en": [
+                "capillaries in the lungs",
+                "bronchi",
+                "alveoli"
+            ]
+        },
+        "answer": {
+            "en": "alveoli"
+        }
+    },
+    {
+        "number": 16,
+        "type": "mcq",
+        "question": {
+            "en": "Important activity takes place in the lungs is :"
+        },
+        "options": {
+            "en": [
+                "blood exchange",
+                "oxygen exchange for carbon dioxide",
+                "sputum exchange"
+            ]
+        },
+        "answer": {
+            "en": "oxygen exchange for carbon dioxide"
+        }
+    },
+    {
+        "number": 17,
+        "type": "mcq",
+        "question": {
+            "en": "2 technique should be done for percussion are :"
+        },
+        "options": {
+            "en": [
+                "fingertips curled strikes the chest wall in its various points.",
+                "tip of the middle finger of the right hand will strike the index or middle finger of the left hand, applied flat on the intercostal spaces.The movement must be done with the wrist",
+                "both hands strike the chest wall."
+            ]
+        },
+        "answer": {
+            "en": "tip of the middle finger of the right hand will strike the index or middle finger of the left hand, applied flat on the intercostal spaces.The movement must be done with the wrist"
+        }
+    },
+    {
+        "number": 18,
+        "type": "mcq",
+        "question": {
+            "en": "Percussion, in pathology, the information provided are :"
+        },
+        "options": {
+            "en": [
+                "dullness and tympany",
+                "normal sonority",
+                "wheezing"
+            ]
+        },
+        "answer": {
+            "en": "dullness and tympany"
+        }
+    },
+    {
+        "number": 19,
+        "type": "mcq",
+        "question": {
+            "en": "In auscultation, equipment to be used for is :"
+        },
+        "options": {
+            "en": [
+                "colonoscope",
+                "stethoscope",
+                "ophthalmoscope"
+            ]
+        },
+        "answer": {
+            "en": "stethoscope"
+        }
+    },
+    {
+        "number": 20,
+        "type": "mcq",
+        "question": {
+            "en": "In pathology, auscultation’s objective is to detect :"
+        },
+        "options": {
+            "en": [
+                "hypersonority",
+                "bullous rails, crackle rails, pleural friction",
+                "vocal vibration"
+            ]
+        },
+        "answer": {
+            "en": "bullous rails, crackle rails, pleural friction"
+        }
+    },
+    {
+        "number": 21,
+        "type": "mcq",
+        "question": {
+            "en": "Time of bullous rails is :"
+        },
+        "options": {
+            "en": [
+                "proto inspiration or both times of respiration and doesn’t modified by coughing.",
+                "proto inspiration or both times of respiration and modified by coughing.",
+                "proto inspiration or both times of respiration and modified by medication"
+            ]
+        },
+        "answer": {
+            "en": "proto inspiration or both times of respiration and modified by coughing."
+        }
+    },
+    {
+        "number": 22,
+        "type": "mcq",
+        "question": {
+            "en": "Time of crackle rails is detected :"
+        },
+        "options": {
+            "en": [
+                "end of inspiration and changed by coughing",
+                "end of inspiration and unchanged by coughing",
+                "end of inspiration and changed by tachypnea"
+            ]
+        },
+        "answer": {
+            "en": "end of inspiration and unchanged by coughing"
+        }
+    },
+    {
+        "number": 23,
+        "type": "mcq",
+        "question": {
+            "en": "Time of pleural friction is :"
+        },
+        "options": {
+            "en": [
+                "both expiration inspiration and modified by dyspnea",
+                "both expiration inspiration and not modified by coughing",
+                "both expiration inspiration and modified by dysphagia"
+            ]
+        },
+        "answer": {
+            "en": "both expiration inspiration and not modified by coughing"
+        }
+    },
+    {
+        "number": 24,
+        "type": "mcq",
+        "question": {
+            "en": "Palpation is to detect :"
+        },
+        "options": {
+            "en": [
+                "vocal vibration in asking patient repeating 33or44",
+                "breath sound",
+                "hemoptysis"
+            ]
+        },
+        "answer": {
+            "en": "vocal vibration in asking patient repeating 33or44"
+        }
+    },
+    {
+        "number": 25,
+        "type": "mcq",
+        "question": {
+            "en": "definition of pulmonary condensation syndrome is :"
+        },
+        "options": {
+            "en": [
+                "presence of pathological cellular products on lung parenchyma or into airway obstruction.",
+                "presence of pathological cellular products on pleural space",
+                "presence of pathological cellular products on pericardial space"
+            ]
+        },
+        "answer": {
+            "en": "presence of pathological cellular products on lung parenchyma or into airway obstruction."
+        }
+    },
+    {
+        "number": 26,
+        "type": "mcq",
+        "question": {
+            "en": "false definition of pulmonary condensation syndrome is :"
+        },
+        "options": {
+            "en": [
+                "presence of liquid-air in pleural cavity",
+                "presence of air in peritoneal cavity",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 27,
+        "type": "mcq",
+        "question": {
+            "en": "Pulmonary condensation is divided in :"
+        },
+        "options": {
+            "en": [
+                "pulmonary condensation with retraction",
+                "pulmonary condensation without retraction",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 28,
+        "type": "mcq",
+        "question": {
+            "en": "Pulmonary condensation is divided in :"
+        },
+        "options": {
+            "en": [
+                "condensation systematized without retraction",
+                "condensation systematized with retraction",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 29,
+        "type": "mcq",
+        "question": {
+            "en": "Pulmonary condensation is :"
+        },
+        "options": {
+            "en": [
+                "condensation not systematized with retraction",
+                "condensation not systematized with excavation",
+                "condensation not systematized with hydro-pneumothorax"
+            ]
+        },
+        "answer": {
+            "en": "condensation not systematized with excavation"
+        }
+    },
+    {
+        "number": 30,
+        "type": "mcq",
+        "question": {
+            "en": "Pulmonary condensation is :"
+        },
+        "options": {
+            "en": [
+                "condensation not systematized without retraction",
+                "condensation not systematized without cavitation",
+                "condensation not systematized with cavitation"
+            ]
+        },
+        "answer": {
+            "en": "condensation not systematized with cavitation"
+        }
+    },
+    {
+        "number": 31,
+        "type": "mcq",
+        "question": {
+            "en": "Disease to be caused by the presence of air in pleural cavity is :"
+        },
+        "options": {
+            "en": [
+                "pulmonary condensation",
+                "pneumothorax",
+                "whooping cough"
+            ]
+        },
+        "answer": {
+            "en": "pneumothorax"
+        }
+    },
+    {
+        "number": 32,
+        "type": "mcq",
+        "question": {
+            "en": "Disease to be caused by the presence of liquid in pleural cavity is :"
+        },
+        "options": {
+            "en": [
+                "mediastinal syndrome",
+                "arm pain",
+                "pleurisy"
+            ]
+        },
+        "answer": {
+            "en": "pleurisy"
+        }
+    },
+    {
+        "number": 33,
+        "type": "mcq",
+        "question": {
+            "en": "The presence of blood in pleural cavity is :"
+        },
+        "options": {
+            "en": [
+                "hemothorax",
+                "chylothorax",
+                "pneumo-mediastin"
+            ]
+        },
+        "answer": {
+            "en": "hemothorax"
+        }
+    },
+    {
+        "number": 34,
+        "type": "mcq",
+        "question": {
+            "en": "Lymph presents in pleural cavity is :"
+        },
+        "options": {
+            "en": [
+                "hemothorax",
+                "chylothorax",
+                "subcutaneous emphysema"
+            ]
+        },
+        "answer": {
+            "en": "chylothorax"
+        }
+    },
+    {
+        "number": 35,
+        "type": "mcq",
+        "question": {
+            "en": "Air and liquid present in pleural cavity is :"
+        },
+        "options": {
+            "en": [
+                "pleurisy",
+                "pneumothorax",
+                "hydro-pneumothorax"
+            ]
+        },
+        "answer": {
+            "en": "hydro-pneumothorax"
+        }
+    },
+    {
+        "number": 36,
+        "type": "mcq",
+        "question": {
+            "en": "Pleural wall itself is thickened without effusion is :"
+        },
+        "options": {
+            "en": [
+                "pleural thickening",
+                "pleural carcinoma",
+                "pleuritis"
+            ]
+        },
+        "answer": {
+            "en": "pleural thickening"
+        }
+    },
+    {
+        "number": 37,
+        "type": "mcq",
+        "question": {
+            "en": "Inspection, in abundance pleurisy is to detect :"
+        },
+        "options": {
+            "en": [
+                "deflation of thorax",
+                "inflation of thorax",
+                "symmetry of thorax"
+            ]
+        },
+        "answer": {
+            "en": "inflation of thorax"
+        }
+    },
+    {
+        "number": 38,
+        "type": "mcq",
+        "question": {
+            "en": "Palpation on abundance pleurisy is looking for 1of 3 is false :"
+        },
+        "options": {
+            "en": [
+                "abolition of vocal vibration",
+                "decrease of vocal vibration",
+                "increase of vocal vibration"
+            ]
+        },
+        "answer": {
+            "en": "increase of vocal vibration"
+        }
+    },
+    {
+        "number": 39,
+        "type": "mcq",
+        "question": {
+            "en": "Percussion on abundance pleurisy is looking for :"
+        },
+        "options": {
+            "en": [
+                "dullness",
+                "sub-dullness",
+                "hyper sonority"
+            ]
+        },
+        "answer": {
+            "en": "dullness"
+        }
+    },
+    {
+        "number": 40,
+        "type": "mcq",
+        "question": {
+            "en": "Auscultation on abundance pleurisy detecting the :"
+        },
+        "options": {
+            "en": [
+                "abolition of breath sound",
+                "abolition of pleural breathing",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 41,
+        "type": "mcq",
+        "question": {
+            "en": "Inspection at pneumothorax is looking for."
+        },
+        "options": {
+            "en": [
+                "hemithorax involved inflation",
+                "hemithorax involved deflation",
+                "thorax symmetry"
+            ]
+        },
+        "answer": {
+            "en": "hemithorax involved inflation"
+        }
+    },
+    {
+        "number": 42,
+        "type": "mcq",
+        "question": {
+            "en": "Palpation on pneumothorax is looking for:"
+        },
+        "options": {
+            "en": [
+                "decrease of vocal vibration",
+                "abolition of vocal vibration",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 43,
+        "type": "mcq",
+        "question": {
+            "en": "Percussion on pneumothorax is looking for 1 of 3 is false :"
+        },
+        "options": {
+            "en": [
+                "dullness",
+                "hypersonority",
+                "tympanic"
+            ]
+        },
+        "answer": {
+            "en": "dullness"
+        }
+    },
+    {
+        "number": 44,
+        "type": "mcq",
+        "question": {
+            "en": "Auscultation on pneumothorax detecting of :"
+        },
+        "options": {
+            "en": [
+                "abolition of breath sound",
+                "increase of breath sound",
+                "abolition of tympanic"
+            ]
+        },
+        "answer": {
+            "en": "abolition of breath sound"
+        }
+    },
+    {
+        "number": 45,
+        "type": "mcq",
+        "question": {
+            "en": "Pleural breathe and pleural friction are detected :"
+        },
+        "options": {
+            "en": [
+                "during the auscultation of pneumothorax",
+                "during the auscultation of pleurisy",
+                "during the auscultation of condensation"
+            ]
+        },
+        "answer": {
+            "en": "during the auscultation of pleurisy"
+        }
+    },
+    {
+        "number": 46,
+        "type": "mcq",
+        "question": {
+            "en": "The above Limit of mediastinum is :"
+        },
+        "options": {
+            "en": [
+                "dorsal cervical thoracic outlet (1st rib)",
+                "chest wall",
+                "vertebral bone"
+            ]
+        },
+        "answer": {
+            "en": "dorsal cervical thoracic outlet (1st rib)"
+        }
+    },
+    {
+        "number": 47,
+        "type": "mcq",
+        "question": {
+            "en": "The below Limit of mediastinum is :"
+        },
+        "options": {
+            "en": [
+                "diaphragm",
+                "dorsal cervical thoracic outlet (1st rib)",
+                "vertebral bone"
+            ]
+        },
+        "answer": {
+            "en": "diaphragm"
+        }
+    },
+    {
+        "number": 48,
+        "type": "mcq",
+        "question": {
+            "en": "The anterior Limit of mediastinum is:"
+        },
+        "options": {
+            "en": [
+                "dorsal cervical thoracic outlet (1st rib)",
+                "chest wall",
+                "diaphragm"
+            ]
+        },
+        "answer": {
+            "en": "chest wall"
+        }
+    },
+    {
+        "number": 49,
+        "type": "mcq",
+        "question": {
+            "en": "the lateral Limit of mediastinum is :"
+        },
+        "options": {
+            "en": [
+                "mediastinum pleura right and left",
+                "chest wall",
+                "vertebral bone"
+            ]
+        },
+        "answer": {
+            "en": "mediastinum pleura right and left"
+        }
+    },
+    {
+        "number": 50,
+        "type": "mcq",
+        "question": {
+            "en": "the posterior limit of mediastinum is:"
+        },
+        "options": {
+            "en": [
+                "diaphragm",
+                "vertebrae",
+                "mediastinum pleura right and left"
+            ]
+        },
+        "answer": {
+            "en": "vertebrae"
+        }
+    }
+];
+        const quizDataPart4 = [
+    {
+        "number": 51,
+        "type": "mcq",
+        "question": {
+            "en": "Immobility and distension of left hemithorax, vocal vibration is abolished, dullness, abolition of breath sounds :"
+        },
+        "options": {
+            "en": [
+                "Mediastinal syndrome",
+                "Pneumothorax",
+                "Pleurisy"
+            ]
+        },
+        "answer": {
+            "en": "Pleurisy"
+        }
+    },
+    {
+        "number": 52,
+        "type": "mcq",
+        "question": {
+            "en": "Paralysis of vocal cord with dysphonia caused by:"
+        },
+        "options": {
+            "en": [
+                "the involvement of left recurrent nerve.",
+                "the involvement of right recurrent nerve.",
+                "inflammation of recurrent nerve."
+            ]
+        },
+        "answer": {
+            "en": "the involvement of left recurrent nerve."
+        }
+    },
+    {
+        "number": 53,
+        "type": "mcq",
+        "question": {
+            "en": "immobile hemithorax involved on inspection, abolition of vocal vibration at the involved hemithorax on palpation, tympanic of involved hemithorax on percussion, abolition of breath sound at involved hemithorax on auscultation :"
+        },
+        "options": {
+            "en": [
+                "condensation syndrome",
+                "Pneumothorax",
+                "Pleurisy"
+            ]
+        },
+        "answer": {
+            "en": "Pneumothorax"
+        }
+    },
+    {
+        "number": 54,
+        "type": "mcq",
+        "question": {
+            "en": "Irritation of vagal nerve may be responsible for :."
+        },
+        "options": {
+            "en": [
+                "bradycardia and palpitation",
+                "tachycardia and palpitation",
+                "tachycardia and pulsation"
+            ]
+        },
+        "answer": {
+            "en": "bradycardia and palpitation"
+        }
+    },
+    {
+        "number": 55,
+        "type": "mcq",
+        "question": {
+            "en": "Mediastinum is divided :"
+        },
+        "options": {
+            "en": [
+                "anterior, middle mediastinums",
+                "posterior mediastinum",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 56,
+        "type": "mcq",
+        "question": {
+            "en": "Mediastinum is divided :"
+        },
+        "options": {
+            "en": [
+                "superior, middle mediastinums",
+                "inferior mediastinum",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 57,
+        "type": "mcq",
+        "question": {
+            "en": "Diaphragmatic nervous irritation has caused :"
+        },
+        "options": {
+            "en": [
+                "Hiccup, dyspnea",
+                "asymmetry of chest movements",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 58,
+        "type": "mcq",
+        "question": {
+            "en": "Organ in the body make up of air carrying tubes and tiny sacs is."
+        },
+        "options": {
+            "en": [
+                "bronchi",
+                "alveoli",
+                "oesophagus"
+            ]
+        },
+        "answer": {
+            "en": "alveoli"
+        }
+    },
+    {
+        "number": 59,
+        "type": "mcq",
+        "question": {
+            "en": "Voice disorders are alteration of speech rhythm( 1 of 3 is true) :"
+        },
+        "options": {
+            "en": [
+                "dysphagia",
+                "dyspnea and chest pain and dysphonia",
+                "dyspnea and abdominal pain and hoarseness"
+            ]
+        },
+        "answer": {
+            "en": "dyspnea and chest pain and dysphonia"
+        }
+    },
+    {
+        "number": 60,
+        "type": "mcq",
+        "question": {
+            "en": "Consequence of cough is :"
+        },
+        "options": {
+            "en": [
+                "productive, dry, emetogenic,",
+                "pain, obnubilant",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 61,
+        "type": "mcq",
+        "question": {
+            "en": "Hemoptysis should be eliminated from :"
+        },
+        "options": {
+            "en": [
+                "ematemesis, epistaxis",
+                "melena, blood sialorrhea",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 62,
+        "type": "mcq",
+        "question": {
+            "en": "Inspiration, pause, expiration, pause of dyspnea linked to a neurological, or acidosis (ketoacidosis diabetes) is."
+        },
+        "options": {
+            "en": [
+                "kussmaul",
+                "Cheyne Stokes",
+                "tachypnea"
+            ]
+        },
+        "answer": {
+            "en": "kussmaul"
+        }
+    },
+    {
+        "number": 63,
+        "type": "mcq",
+        "question": {
+            "en": "Dyspnea with movements of increasing amplitude, then decreases, and pause observed in chronic left heart failure, renal acidosis, anemia and severe poisoning is :"
+        },
+        "options": {
+            "en": [
+                "Cheyne stokes",
+                "kussmaul",
+                "apnea"
+            ]
+        },
+        "answer": {
+            "en": "Cheyne stokes"
+        }
+    },
+    {
+        "number": 64,
+        "type": "mcq",
+        "question": {
+            "en": "Characteristic origin of bullous rails is :"
+        },
+        "options": {
+            "en": [
+                "alveoli",
+                "trachea bronchi",
+                "pleura"
+            ]
+        },
+        "answer": {
+            "en": "trachea bronchi"
+        }
+    },
+    {
+        "number": 65,
+        "type": "mcq",
+        "question": {
+            "en": "Characteristic origin of crackle rails is :"
+        },
+        "options": {
+            "en": [
+                "alveoli",
+                "windpipe",
+                "oesophagus"
+            ]
+        },
+        "answer": {
+            "en": "alveoli"
+        }
+    },
+    {
+        "number": 66,
+        "type": "mcq",
+        "question": {
+            "en": "Characteristic origin of pleural friction is :."
+        },
+        "options": {
+            "en": [
+                "pleural layer membranes",
+                "pleural cavity",
+                "pleural thickening"
+            ]
+        },
+        "answer": {
+            "en": "pleural layer membranes"
+        }
+    },
+    {
+        "number": 71,
+        "type": "mcq",
+        "question": {
+            "en": "2 types of weight disorders are :"
+        },
+        "options": {
+            "en": [
+                "obesity",
+                "Tinny.",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 72,
+        "type": "mcq",
+        "question": {
+            "en": "General signs are :."
+        },
+        "options": {
+            "en": [
+                "hiccup, Asthenia",
+                "anorexia, fever",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 73,
+        "type": "mcq",
+        "question": {
+            "en": "Signs of differential elimination between pneumothorax vs pleurisy is :"
+        },
+        "options": {
+            "en": [
+                "increase of vocal vibration and wheezing diffuse",
+                "increase of breath sound and wheezing diffuse",
+                "tympanic (Pneumothorax) and dullness (Pleurisy )"
+            ]
+        },
+        "answer": {
+            "en": "tympanic (Pneumothorax) and dullness (Pleurisy )"
+        }
+    },
+    {
+        "number": 74,
+        "type": "mcq",
+        "question": {
+            "en": "Thorax skeletal deformity is :"
+        },
+        "options": {
+            "en": [
+                "scoliosis, kyphosis, kyphoscoliosis",
+                "pectus carinatum, pectus excavatum",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 75,
+        "type": "mcq",
+        "question": {
+            "en": "Pleural syndrome are :"
+        },
+        "options": {
+            "en": [
+                "pneumothorax, pleurisy, hydropneumothorax",
+                "chylothorax, hemothorax, pleural thickening",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 76,
+        "type": "mcq",
+        "question": {
+            "en": "Breathe sound, vocal vibration are abolished, dullness, hemithorax involved deformity, presented in :"
+        },
+        "options": {
+            "en": [
+                "pleurisy, hemothorax",
+                "chylothorax",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 77,
+        "type": "mcq",
+        "question": {
+            "en": "Breath sound abolish vocal vibration abolish, tympanic, hemithorax involved deformity seen in :"
+        },
+        "options": {
+            "en": [
+                "pneumothorax",
+                "chylothorax",
+                "pleural thickening"
+            ]
+        },
+        "answer": {
+            "en": "pneumothorax"
+        }
+    },
+    {
+        "number": 78,
+        "type": "mcq",
+        "question": {
+            "en": "Percussion in Pneumothorax Vs Pleurisy to identify :"
+        },
+        "options": {
+            "en": [
+                "tympanic",
+                "sonority",
+                "dullness."
+            ]
+        },
+        "answer": {
+            "en": "tympanic"
+        }
+    },
+    {
+        "number": 79,
+        "type": "mcq",
+        "question": {
+            "en": "Disease responsible for obnubilant cough is :"
+        },
+        "options": {
+            "en": [
+                "whooping cough",
+                "pleurisy",
+                "asthma"
+            ]
+        },
+        "answer": {
+            "en": "whooping cough"
+        }
+    },
+    {
+        "number": 80,
+        "type": "mcq",
+        "question": {
+            "en": "Pulmonary condensation with retraction is to have in :"
+        },
+        "options": {
+            "en": [
+                "atelectasis",
+                "volume loss",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 81,
+        "type": "mcq",
+        "question": {
+            "en": "Pulmonary condensation without retraction is to have :"
+        },
+        "options": {
+            "en": [
+                "normal volume",
+                "a,c",
+                "acute pneumonia"
+            ]
+        },
+        "answer": {
+            "en": "b"
+        }
+    },
+    {
+        "number": 82,
+        "type": "mcq",
+        "question": {
+            "en": "Kussmaul and Cheyne Stokes are the."
+        },
+        "options": {
+            "en": [
+                "signs of central involvement of dyspnea",
+                "signs of peripheral involvement of dyspnea",
+                "signs of bronchial involvement of dyspnea"
+            ]
+        },
+        "answer": {
+            "en": "signs of central involvement of dyspnea"
+        }
+    },
+    {
+        "number": 83,
+        "type": "mcq",
+        "question": {
+            "en": "hoarseness (dysphonia) sign caused by :"
+        },
+        "options": {
+            "en": [
+                "involvement of left recurrent nerve",
+                "involvement of right recurrent nerve",
+                "inflammation of right recurrent nerve"
+            ]
+        },
+        "answer": {
+            "en": "involvement of left recurrent nerve"
+        }
+    },
+    {
+        "number": 85,
+        "type": "mcq",
+        "question": {
+            "en": "Definition of hemoptysis is rejection of blood by mouth from : (choose false answer)"
+        },
+        "options": {
+            "en": [
+                "digestive system.",
+                "urinary system.",
+                "subglottic respiratory system"
+            ]
+        },
+        "answer": {
+            "en": "urinary system."
+        }
+    },
+    {
+        "number": 88,
+        "type": "mcq",
+        "question": {
+            "en": "Ventilation times are :"
+        },
+        "options": {
+            "en": [
+                "hyperpnea",
+                "respiratory failure",
+                "inspiratory and expiratory"
+            ]
+        },
+        "answer": {
+            "en": "inspiratory and expiratory"
+        }
+    },
+    {
+        "number": 90,
+        "type": "mcq",
+        "question": {
+            "en": "The objective of palpation is :"
+        },
+        "options": {
+            "en": [
+                "vocal vibration",
+                "tumors, lymph nodes",
+                "a,b"
+            ]
+        },
+        "answer": {
+            "en": "a,b"
+        }
+    },
+    {
+        "number": 93,
+        "type": "mcq",
+        "question": {
+            "en": "The presence of lymph and triglyceride in pleural cavity is diagnosed as :"
+        },
+        "options": {
+            "en": [
+                "pneumothorax",
+                "hydro-pneumothorax",
+                "chylothorax"
+            ]
+        },
+        "answer": {
+            "en": "chylothorax"
+        }
+    },
+    {
+        "number": 94,
+        "type": "mcq",
+        "question": {
+            "en": "involvement of left recurrent nerve to have :"
+        },
+        "options": {
+            "en": [
+                "dysphonia",
+                "hoarseness",
+                "dysphagia"
+            ]
+        },
+        "answer": {
+            "en": "dysphonia"
+        }
+    },
+    {
+        "number": 102,
+        "type": "mcq",
+        "question": {
+            "en": "NYHA Dyspnea with no limitation of physical activity តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "class 1",
+                "class 2",
+                "class 3"
+            ]
+        },
+        "answer": {
+            "en": "class 2"
+        }
+    },
+    {
+        "number": 103,
+        "type": "mcq",
+        "question": {
+            "en": "NYHA Dyspnea with symptom at major activity តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "class 1",
+                "class 4",
+                "class 2"
+            ]
+        },
+        "answer": {
+            "en": "class 4"
+        }
+    },
+    {
+        "number": 104,
+        "type": "mcq",
+        "question": {
+            "en": "NYHA Dyspnea with symptom during efforts of everyday life តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "class 3",
+                "class 2.",
+                "class 1"
+            ]
+        },
+        "answer": {
+            "en": "class 1"
+        }
+    },
+    {
+        "number": 105,
+        "type": "mcq",
+        "question": {
+            "en": "NYHA Dyspnea with symptom at rest accentuated by the slightest efforts"
+        },
+        "options": {
+            "en": [
+                "class1",
+                "class 4",
+                "class 2"
+            ]
+        },
+        "answer": {
+            "en": "class 4"
+        }
+    },
+    {
+        "number": 108,
+        "type": "mcq",
+        "question": {
+            "en": "the body’s system of nerve is តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "respirstory system",
+                "urinary system",
+                "nervous system"
+            ]
+        },
+        "answer": {
+            "en": "respirstory system"
+        }
+    },
+    {
+        "number": 109,
+        "type": "mcq",
+        "question": {
+            "en": "the body’s food-processing system is តើណា១ត្រូវ ?"
+        },
+        "options": {
+            "en": [
+                "respirstory system",
+                "urinary system",
+                "digestive system"
+            ]
+        },
+        "answer": {
+            "en": "digestive system"
+        }
+    },
+    {
+        "number": 110,
+        "type": "mcq",
+        "question": {
+            "en": "the body’s blood-transporting system is តើណា១ត្រូវ ?"
+        },
+        "options": {
+            "en": [
+                "respirstory system",
+                "urinary system",
+                "circulatory system"
+            ]
+        },
+        "answer": {
+            "en": "circulatory system"
+        }
+    },
+    {
+        "number": 111,
+        "type": "mcq",
+        "question": {
+            "en": "Air can enter the body and travel to the lungs through តើណាខ្លះត្រូវ ?"
+        },
+        "options": {
+            "en": [
+                "mouth",
+                "nose.",
+                "blood"
+            ]
+        },
+        "answer": {
+            "en": "nose."
+        }
+    },
+    {
+        "number": 112,
+        "type": "mcq",
+        "question": {
+            "en": "Air can enter the body and travel to the lungs through the តើណា១ត្រូវ?"
+        },
+        "options": {
+            "en": [
+                "esophagus.",
+                "inspiration",
+                "expiration"
+            ]
+        },
+        "answer": {
+            "en": "inspiration"
+        }
+    },
+    {
+        "number": 113,
+        "type": "mcq",
+        "question": {
+            "en": "Air can enter the body and travel to the lungs through the តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "nervous system.",
+                "skin",
+                "nose and mouth"
+            ]
+        },
+        "answer": {
+            "en": "nervous system."
+        }
+    },
+    {
+        "number": 116,
+        "type": "mcq",
+        "question": {
+            "en": "Windpipe (trachea) before reaches the lungs has been branched in តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "3 directions",
+                "4 directions",
+                "two directions"
+            ]
+        },
+        "answer": {
+            "en": "3 directions"
+        }
+    },
+    {
+        "number": 118,
+        "type": "mcq",
+        "question": {
+            "en": "The sputum is : តើណា១ត្រូវ?"
+        },
+        "options": {
+            "en": [
+                "not saliva",
+                "pure saliva",
+                "nasal secretion"
+            ]
+        },
+        "answer": {
+            "en": "not saliva"
+        }
+    },
+    {
+        "number": 120,
+        "type": "mcq",
+        "question": {
+            "en": "rejection of blood from gastrointestinal tract during the vomiting. This blood is black, not aerated, mixed with clots and food and following by melena. តើណាខ្លះខុស?"
+        },
+        "options": {
+            "en": [
+                "hemoptysis",
+                "digestive hemorrhage",
+                "epistaxis"
+            ]
+        },
+        "answer": {
+            "en": "hemoptysis"
+        }
+    },
+    {
+        "number": 135,
+        "type": "mcq",
+        "question": {
+            "en": "3 main causes of hemoptysis are:"
+        },
+        "options": {
+            "en": [
+                "Lung cancer.",
+                "Pulmonary tuberculosis.",
+                "Bronchiectasis.",
+                "Gastritis"
+            ]
+        },
+        "answer": {
+            "en": "Gastritis"
+        }
+    },
+    {
+        "number": 136,
+        "type": "mcq",
+        "question": {
+            "en": "Thorax skeletal deformities are as follows:"
+        },
+        "options": {
+            "en": [
+                "kyphoscoliosis.",
+                "Pectus excavatum.",
+                "Pectus carinatum."
+            ]
+        },
+        "answer": {
+            "en": "kyphoscoliosis."
+        }
+    },
+    {
+        "number": 137,
+        "type": "mcq",
+        "question": {
+            "en": "Frequency of respiratory movements: In adult normal:"
+        },
+        "options": {
+            "en": [
+                "12-16 cycles/minute,",
+                "7-10 cycles/minute.",
+                "28-34 cycles/minute."
+            ]
+        },
+        "answer": {
+            "en": "12-16 cycles/minute,"
+        }
+    },
+    {
+        "number": 138,
+        "type": "mcq",
+        "question": {
+            "en": "How many techniques should be done for percussion ?"
+        },
+        "options": {
+            "en": [
+                "2 techniques ( immediate and mediate )",
+                "3 techniques",
+                "4 techniques"
+            ]
+        },
+        "answer": {
+            "en": "2 techniques ( immediate and mediate )"
+        }
+    },
+    {
+        "number": 139,
+        "type": "mcq",
+        "question": {
+            "en": "What results to be provided by percussion?"
+        },
+        "options": {
+            "en": [
+                "Tympanic",
+                "Dullness",
+                "Snoring",
+                "Normal sonority"
+            ]
+        },
+        "answer": {
+            "en": "Snoring"
+        }
+    },
+    {
+        "number": 140,
+        "type": "mcq",
+        "question": {
+            "en": "objective of Auscultation is to detect :"
+        },
+        "options": {
+            "en": [
+                "Breath sound normal",
+                "Crackles",
+                "Wheezing",
+                "Abolition of breath sound",
+                "Dullness"
+            ]
+        },
+        "answer": {
+            "en": "Dullness"
+        }
+    },
+    {
+        "number": 141,
+        "type": "mcq",
+        "question": {
+            "en": "objective of Palpation is to collect :"
+        },
+        "options": {
+            "en": [
+                "Vocal vibration normal",
+                "Abolition or decrease of vocal vibration",
+                "a,b in asking patient repeating 33 or 44."
+            ]
+        },
+        "answer": {
+            "en": "a,b in asking patient repeating 33 or 44."
+        }
+    },
+    {
+        "number": 142,
+        "type": "mcq",
+        "question": {
+            "en": "What respiration’s time of rail bullous ( sub crackles)?"
+        },
+        "options": {
+            "en": [
+                "Both times of respiration",
+                "Proto inspiration",
+                "a,b and modified by coughing"
+            ]
+        },
+        "answer": {
+            "en": "a,b and modified by coughing"
+        }
+    },
+    {
+        "number": 143,
+        "type": "mcq",
+        "question": {
+            "en": "What respiration’s time of crackles?"
+        },
+        "options": {
+            "en": [
+                "Ends of inspiration and unchanged by coughing",
+                "Expiration",
+                "Both times of respiration"
+            ]
+        },
+        "answer": {
+            "en": "Ends of inspiration and unchanged by coughing"
+        }
+    },
+    {
+        "number": 144,
+        "type": "mcq",
+        "question": {
+            "en": "The anterior Limit of mediastinum are as follows: Which one is true? ( ព្រំប្រទល់​ mediastinum ផ្នែកខាងមុខ មាន​៣ដូចខាងក្រោម​ តើណាមួយត្រូវ?)"
+        },
+        "options": {
+            "en": [
+                "chest wall.",
+                "Sternum",
+                "Abdomen"
+            ]
+        },
+        "answer": {
+            "en": "chest wall."
+        }
+    },
+    {
+        "number": 145,
+        "type": "mcq",
+        "question": {
+            "en": "the lateral Limit of mediastinum are as follows: Which one is true? ( ព្រំប្រទល់ mediastinum ផ្នែក​សង្ខាង មាន២ ដូចខាងក្រោម​ ណាមួយត្រូវ?)"
+        },
+        "options": {
+            "en": [
+                "right pleural mediastinum",
+                "left pleural mediastinum"
+            ]
+        },
+        "answer": {
+            "en": "right pleural mediastinum"
+        }
+    },
+    {
+        "number": 146,
+        "type": "mcq",
+        "question": {
+            "en": "the posterior limit of mediastinum are as follows: Which one is true? ( ព្រំប្រទល់​ mediastinum ផ្នែកខាងក្រោយ មាន២ ដូចខាងក្រោម​ ណាមួយត្រូវ?)"
+        },
+        "options": {
+            "en": [
+                "Vertebrae.",
+                "Ribs"
+            ]
+        },
+        "answer": {
+            "en": "Vertebrae."
+        }
+    },
+    {
+        "number": 147,
+        "type": "mcq",
+        "question": {
+            "en": "Paralysis of vocal cord with dysphonia. Which one is true? ( រោគសញ្ញាទាំង២ខាងក្រោម​ ណាមួយត្រូវ?)"
+        },
+        "options": {
+            "en": [
+                "involvement of left recurrent nerve.",
+                "involvement of right recurrent nerve."
+            ]
+        },
+        "answer": {
+            "en": "involvement of left recurrent nerve."
+        }
+    },
+    {
+        "number": 148,
+        "type": "mcq",
+        "question": {
+            "en": "Alteration of speech rhythm. Which one is true? ( រោគសញ្ញាទាំង៣ខាងក្រោម​ ណាខ្លះត្រូវ?)"
+        },
+        "options": {
+            "en": [
+                "dyspnea",
+                "chest pain",
+                "dysphonia."
+            ]
+        },
+        "answer": {
+            "en": "dysphonia."
+        }
+    }
+];
+        let quizDataPart5 = [
+    {
+        "number": 67,
+        "type": "fill-in",
+        "question": { "en": "Dyspnea classification by NYHA (Class1 = ពន្យល់)?" },
+        "answer": { "en": "no limitation of physical activity" }
+    },
+    {
+        "number": 68,
+        "type": "fill-in",
+        "question": { "en": "Dyspnea classification by NYHA (Class2 = ពន្យល់)?" },
+        "answer": { "en": "symptom at major activity" }
+    },
+    {
+        "number": 69,
+        "type": "fill-in",
+        "question": { "en": "Dyspnea classification by NYHA (Class3 = ពន្យល់)?" },
+        "answer": { "en": "symptom during efforts of everyday life" }
+    },
+    {
+        "number": 70,
+        "type": "fill-in",
+        "question": { "en": "Dyspnea classification by NYHA (Class4 = ពន្យល់)?" },
+        "answer": { "en": "symptom at rest accentuated by the slightest efforts" }
+    },
+    {
+        "number": 84,
+        "type": "fill-in",
+        "question": { "en": "Definition of sputum :" },
+        "answer": { "en": "Abnormal secretion>100ml/day from subglottal of respiratory system." }
+    },
+    {
+        "number": 86,
+        "type": "fill-in",
+        "question": { "en": "Definition of dyspnea :" },
+        "answer": { "en": "Respiratory discomfort feeling by patient and visible changes in ventilation." }
+    },
+    {
+        "number": 87,
+        "type": "fill-in",
+        "question": { "en": "dyspnea classified :" },
+        "answer": { "en": "apnea, bradypnea, tachypnea, hyperventilation, polypnea, Orthopnea." }
+    },
+    {
+        "number": 89,
+        "type": "fill-in",
+        "question": { "en": "4 important stages of physical examination are :" },
+        "answer": { "en": "inspection, Palpation, Percussion, Auscultation." }
+    },
+    {
+        "number": 91,
+        "type": "fill-in",
+        "question": { "en": "The presence of blood not coagulant in pleural cavity is diagnosed as :" },
+        "answer": { "en": "sero-hemorrhagic pleurisy." }
+    },
+    {
+        "number": 92,
+        "type": "fill-in",
+        "question": { "en": "The presence of bood coagulated in pleural cavity is diagnosed as :" },
+        "answer": { "en": "Hemothorax." }
+    },
+    {
+        "number": 95,
+        "type": "fill-in",
+        "question": { "en": "The superior veina cava syndrome បណ្តាលមកពីមូលហេតុអ្វី?" },
+        "answer": { "en": "mediastinal tumor" }
+    },
+    {
+        "number": 96,
+        "type": "fill-in",
+        "question": { "en": "The intrathoracic goiter, hilar lymph nodes enlargement, thymoma  ជា syndrome អ្វី ?" },
+        "answer": { "en": "mediastinal syndrome." }
+    },
+    {
+        "number": 97,
+        "type": "fill-in",
+        "question": { "en": "Palpitation and tachycardia ជា signesប៉ះពាល់ អ្វី ?" },
+        "answer": { "en": "vagal nerve involvement" }
+    },
+    {
+        "number": 98,
+        "type": "fill-in",
+        "question": { "en": "Hiccup, dyspnea and chest movement asymmetry ជា signesប៉ះពាល់ អ្វី ?" },
+        "answer": { "en": "irritation or compression of phrenic" }
+    },
+    {
+        "number": 99,
+        "type": "fill-in",
+        "question": { "en": "Anterior mediastinal syndrome បណ្តាលឲ្យមាន signes អ្វី ខ្លះ?" },
+        "answer": { "en": "retrosternal pain + superior veina cava syndrome" }
+    },
+    {
+        "number": 100,
+        "type": "fill-in",
+        "question": { "en": "Middle mediastinal syndrome បណ្តាលឲ្យមាន signes អ្វី ខ្លះ?" },
+        "answer": { "en": "respiratory manifestation + phrenic or recurrent laryngeal paralysis." }
+    },
+    {
+        "number": 101,
+        "type": "fill-in",
+        "question": { "en": "Posterior mediastinal syndrome បណ្តាលឲ្យមាន signes អ្វី ខ្លះ?" },
+        "answer": { "en": "dysphagia, pain intercostal chest." }
+    },
+    {
+        "number": 106,
+        "type": "fill-in",
+        "question": { "en": "Auscultation in pleural pathology ត្រូវស្រាវជ្រាវរកសញ្ញាអ្វីខ្លះ?" },
+        "answer": { "en": "Abolition or decrease of breath sound." }
+    },
+    {
+        "number": 107,
+        "type": "fill-in",
+        "question": { "en": "Body’s breathing system is" },
+        "answer": { "en": "Airway system." }
+    },
+    {
+        "number": 114,
+        "type": "fill-in",
+        "question": { "en": "The another name of windpipe is" },
+        "answer": { "en": "trachea" }
+    },
+    {
+        "number": 115,
+        "type": "fill-in",
+        "question": { "en": "The windpipe (trachea) before reaches the lungs has been branched in :" },
+        "answer": { "en": "left main bronchus and right main bronchus" }
+    },
+    {
+        "number": 117,
+        "type": "fill-in",
+        "question": { "en": "The definition of cough is:" },
+        "answer": { "en": "reflex act, neurogenic and act of defense" }
+    },
+    {
+        "number": 119,
+        "type": "fill-in",
+        "question": { "en": "Definition of hemoptysis is :" },
+        "answer": { "en": "rejection of blood from the mouth of the party sub-glottal of the respiratory tree." }
+    },
+    {
+        "number": 121,
+        "type": "fill-in",
+        "question": { "en": "main causes of hemoptysis:" },
+        "answer": { "en": "Lung cancer, pulmonary tuberculosis, bronchiectasis, pulmonary embolism" }
+    },
+    {
+        "number": 122,
+        "type": "fill-in",
+        "question": { "en": "Objective of inspection is :" },
+        "answer": { "en": "to detect the morphology of thorax (Asymmetry, symmetry) and respiratory movements." }
+    },
+    {
+        "number": 123,
+        "type": "fill-in",
+        "question": { "en": "Thorax cylindrical barrel with increased anterior-posterior diameter seen in :" },
+        "answer": { "en": "emphysema." }
+    },
+    {
+        "number": 124,
+        "type": "fill-in",
+        "question": { "en": "breath sound can be abolished in case of :" },
+        "answer": { "en": "pleural effusion." }
+    },
+    {
+        "number": 125,
+        "type": "fill-in",
+        "question": { "en": "breath sound can be abolished in case of :" },
+        "answer": { "en": "pulmonary condensation with retraction(atelectasis)" }
+    },
+    {
+        "number": 126,
+        "type": "fill-in",
+        "question": { "en": "breath sound can be reduced in case of :" },
+        "answer": { "en": "chest wall thickening (obesity)" }
+    },
+    {
+        "number": 127,
+        "type": "fill-in",
+        "question": { "en": "breath sound can be reduced in case of" },
+        "answer": { "en": "the superior vena cava by tumor." }
+    },
+     {
+        "number": 128,
+        "type": "fill-in",
+        "question": { "en": "jugular turgor reflects an obstruction or compression of :" },
+        "answer": { "en": "bronchoscopy" }
+    },
+    {
+        "number": 130,
+        "type": "fill-in",
+        "question": { "en": "tessential technique to diagnose the respiratory diseases is :" },
+        "answer": { "en": "thoracic distension." }
+    },
+    {
+        "number": 131,
+        "type": "fill-in",
+        "question": { "en": "What is the type of bronchoscopy :" },
+        "answer": { "en": "rigid and flexible." }
+    },
+    {
+        "number": 133,
+        "type": "fill-in",
+        "question": { "en": "Pain down on inner edge of the arm and the 5th finger with sensory disorders in the same territory: សញ្ញាទាំងនេះបណ្តាលមកពីមូលហេតុអ្វី ?" },
+        "answer": { "en": "involvement of brachial plexus nerves" }
+    },
+    {
+        "number": 134,
+        "type": "fill-in",
+        "question": { "en": "The rejection of blood from the mouth of the party sub-glottal of the respiratory tree : តើជាសញ្ញាជម្ងឺអ្វី ?" },
+        "answer": { "en": "Hemoptysis" }
+    },
+    {
+        "number": 135,
+        "type": "fill-in",
+        "question": { "en": "What’s the consequence of cough? ( ផលវិបាក​ បណ្តាលមកពីក្អក )" },
+        "answer": { "en": "Productive, Dry, Pain, Emetogenic, Obnubilant" }
+    },
+    {
+        "number": 149,
+        "type": "fill-in",
+        "question": { "en": "What’s disease to be differentiated from Hemoptysis?​​ ( តើជម្ងឺអ្វីខ្លះដែលអាចច្រឡំជាមួយនឹងក្អកធ្លាក់ឈាម)?" },
+        "answer": { "en": "Epistaxis, Hematemesis, gingival hemorrhage, blood saliva" }
+    },
+    {
+        "number": 150,
+        "type": "fill-in",
+        "question": { "en": "What’s the origin of bullous rails? ( ប្រភព bullous rails​)" },
+        "answer": { "en": "Trachea and bronchi" }
+    },
+    {
+        "number": 151,
+        "type": "fill-in",
+        "question": { "en": "What’s signs to be developed while to irritate, to compress of the left recurrent nerve?​ (​រោគសញ្ញាគ្លីនិកកើតឡើងដោយសាររលាក​,​គៀប left recurrent nerve)។" },
+        "answer": { "en": "DYSPHONIA" }
+    },
+    {
+        "number": 152,
+        "type": "fill-in",
+        "question": { "en": "What’s signs caused by to damage of vagal nerve?​ ( រោគសញ្ញាគ្លីនិកកើតឡើងដោយសារការខូច​, ដាច់ vagal nerve)។" },
+        "answer": { "en": "PALPITATION, TACHYCARDIA" }
+    },
+    {
+        "number": 153,
+        "type": "fill-in",
+        "question": { "en": "What’s the origin of crackle rails?​ (​ តើប្រភព crackle rails នៅត្រង់ណា ?)" },
+        "answer": { "en": "ALVEOLI" }
+    },
+    {
+        "number": 154,
+        "type": "fill-in",
+        "question": { "en": "What’s the origin of pleural friction? (​ តើប្រភពPleural frictionនៅត្រង់ណា ?)" },
+        "answer": { "en": "PLEURAL LAYER MEMBRANE" }
+    },
+    {
+        "number": 155,
+        "type": "fill-in",
+        "question": { "en": "By NYHA,what’s the sign of Class 3 of Dyspnea? ( រោគសញ្ញាគ្លីនិក​ Dyspnea class 3 }" },
+        "answer": { "en": "SYMPTOM DURING EFFORTS OF EVERYDAY LIFE" }
+    },
+    {
+        "number": 156,
+        "type": "fill-in",
+        "question": { "en": "Signs of pleurisy ?​(​​ រោគសញ្ញាគ្លីនិក​ជម្ងឺទឹកក្នុងស្រោមសួត? )" },
+        "answer": { "en": "IMMOBILITY OF HEMITHORAX, ABOLITION OF BREATH SOUND, ABOLITION OF VOCAL VIBRATION, DULLNESS" }
+    },
+    {
+        "number": 157,
+        "type": "fill-in",
+        "question": { "en": "Signs of pneumothorax ( Air in pleural space ) ( ​រោគសញ្ញាគ្លីនិកខ្យល់ក្នុងស្រោមសួត ​​)។" },
+        "answer": { "en": "IMMOBILITY OF HEMITHORAX, ABOLITION OF BREATH SOUND, ABOLITION OF VOCAL VIBRATION, TYMPANY" }
+    },
+    {
+        "number": 162,
+        "type": "fill-in",
+        "question": { "en": "Mr. X, 34 years old consults you : 2 months ago, he has complaint about the dry cough with predominance in the change of position, pain on the chest with radiation to shoulder, superficial tachypnea with frequency of 36cycles/minute associated to fever at 38.5c. Physical examination presents : Immobility and distension of left hemithorax, vocal vibration abolished, dullness, abolition of breath sounds. This clinical case can be related to :" },
+        "answer": { "en": "PLEURISY." }
+    },
+    {
+        "number": 163,
+        "type": "fill-in",
+        "question": { "en": "Retrosternal pain + superior vena cava តើរោគសញ្ញាខាងលើប៉ពាល់ផ្នែកណារបស់​ mediastinum ?" },
+        "answer": { "en": "Anterior mediastinum syndromes" }
+    },
+    {
+        "number": 164,
+        "type": "fill-in",
+        "question": { "en": "Respiratory manifestations + phrenic or recurrent paralysis តើរោគសញ្ញាខាងលើប៉ពាល់ផ្នែកណារបស់​ mediastinum ?" },
+        "answer": { "en": "Medial mediastinum syndromes" }
+    },
+    {
+        "number": 165,
+        "type": "fill-in",
+        "question": { "en": "Dysphagia + thoracic intercostal pain តើរោគសញ្ញាខាងលើប៉ពាល់ផ្នែកណារបស់​ mediastinum ?" },
+        "answer": { "en": "Posterior mediastinum syndromes" }
+    }
+];
+
+        const quizDataPart6 = [];
+        let quizData;
+
+        let currentPart = 1;
+        let quizState = {};
+
+        // Sound Synthesis
+        const correctSynth = new Tone.Synth().toDestination();
+        const incorrectSynth = new Tone.Synth().toDestination();
+        let audioStarted = false;
+
+        // DOM Elements
+        const part1Btn = document.getElementById('part1-btn');
+        const part2Btn = document.getElementById('part2-btn');
+        const part3Btn = document.getElementById('part3-btn');
+        const part4Btn = document.getElementById('part4-btn');
+        const part5Btn = document.getElementById('part5-btn');
+        const part6Btn = document.getElementById('part6-btn');
+        const quizView = document.getElementById('quiz-view');
+        const editView = document.getElementById('edit-view');
+        const practiceSheetBtn = document.getElementById('practice-sheet-btn');
+        const practiceSheetView = document.getElementById('practice-sheet-view');
+        const showAllBtn = document.getElementById('show-all-btn');
+        const allQuestionsView = document.getElementById('all-questions-view');
+        const editQuizBtn = document.getElementById('edit-quiz-btn');
+        const applyPreviewBtn = document.getElementById('apply-preview-btn');
+        const generateSaveCodeBtn = document.getElementById('generate-save-code-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const editQuestionsContainer = document.getElementById('edit-questions-container');
+        const editQuestionNavArea = document.getElementById('edit-question-navigation');
+        const exportArea = document.getElementById('export-area');
+        const exportOutput = document.getElementById('export-output');
+        const copyFeedbackEl = document.getElementById('copy-feedback');
+
+        const mainScoreTextEl = document.getElementById('main-score-text');
+        const questionNavArea = document.getElementById('question-navigation');
+        const questionArea = document.getElementById('question-area');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const answerArea = document.getElementById('answer-area');
+        const feedbackArea = document.getElementById('feedback-area');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        const redoPartBtn = document.getElementById('redo-part-btn');
+        const resultsArea = document.getElementById('results-area');
+        const resultsScoreEl = document.getElementById('results-score');
+        const summaryEl = document.getElementById('summary');
+        const restartBtn = document.getElementById('restart-btn');
+
+        let isAnswered = false;
+
+        async function startAudio() {
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+            }
+        }
+        
+        async function fetchPart6Data() {
+            const url = 'https://cdn.jsdelivr.net/gh/jingjork023-dev/med-semio-02@main/db.js';
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                const jsText = await response.text(); 
+                
+                const jsonString = jsText.substring(jsText.indexOf('[') , jsText.lastIndexOf(']') + 1);
+                const data = JSON.parse(jsonString); 
+                
+                if (data && Array.isArray(data)) { 
+                    questionTextEl.innerHTML = ""; 
+                    quizDataPart6.length = 0;
+                    quizDataPart6.push(...data); 
+                } else {
+                     throw new Error('Invalid data format from the source URL.');
+                }
+            } catch (error) {
+                console.error("Failed to fetch Part 6 data:", error);
+                questionTextEl.innerHTML = `<p class="text-red-500 font-semibold">Failed to load questions for Part 6.</p>
+                                            <p class="text-gray-600 my-2">You can try accessing the quiz directly:</p>
+                                            <a href="https://jingjork023-dev.github.io/med-semio-02/" target="_blank" class="text-blue-600 hover:underline">https://jingjork023-dev.github.io/med-semio-02/</a>`;
+                quizDataPart6.length = 0; 
+            }
+        }
+
+        async function switchPart(part) {
+            currentPart = part;
+
+            part1Btn.classList.remove('bg-indigo-600', 'text-white');
+            part1Btn.classList.add('bg-white', 'text-gray-900');
+            part2Btn.classList.remove('bg-indigo-600', 'text-white');
+            part2Btn.classList.add('bg-white', 'text-gray-900');
+            part3Btn.classList.remove('bg-indigo-600', 'text-white');
+            part3Btn.classList.add('bg-white', 'text-gray-900');
+            part4Btn.classList.remove('bg-indigo-600', 'text-white');
+            part4Btn.classList.add('bg-white', 'text-gray-900');
+            part5Btn.classList.remove('bg-indigo-600', 'text-white');
+            part5Btn.classList.add('bg-white', 'text-gray-900');
+            part6Btn.classList.remove('bg-indigo-600', 'text-white');
+            part6Btn.classList.add('bg-white', 'text-gray-900');
+            
+            let targetBtn;
+            if (part === 1) {
+                quizData = quizDataPart1;
+                targetBtn = part1Btn;
+            } else if (part === 2){
+                quizData = quizDataPart2;
+                targetBtn = part2Btn;
+            } else if (part === 3){
+                quizData = quizDataPart3;
+                targetBtn = part3Btn;
+            } else if (part === 4){
+                quizData = quizDataPart4;
+                targetBtn = part4Btn;
+            } else if (part === 5){
+                quizData = quizDataPart5;
+                targetBtn = part5Btn;
+            } else {
+                targetBtn = part6Btn;
+                if (quizDataPart6.length === 0) {
+                    // Show loading state immediately
+                    questionTextEl.innerHTML = "Loading Part 6 questions from external source...";
+                    answerArea.innerHTML = '';
+                    questionNavArea.innerHTML = '';
+                    nextBtn.classList.add('hidden');
+                    prevBtn.classList.add('hidden');
+                    document.getElementById('quiz-subtitle').textContent = `Subject: Immunology ( loading... questions)`;
+                    
+                    await fetchPart6Data();
+                }
+                quizData = quizDataPart6;
+            }
+            
+            targetBtn.classList.add('bg-indigo-600', 'text-white');
+            targetBtn.classList.remove('bg-white', 'text-gray-900');
+            
+            document.getElementById('quiz-subtitle').textContent = `Subject: Immunology ( ${quizData.length} questions)`;
+            loadQuizView();
+        }
+
+        function updateScoreText() {
+            mainScoreTextEl.innerHTML = `Score: ${quizState[currentPart].score} / ${quizData.length}`;
+        }
+
+        function startQuiz() {
+            initializeQuiz();
+        }
+        
+        function initializeQuiz() {
+            quizState = {
+                1: { userAnswers: [], score: 0, currentQuestionIndex: 0 },
+                2: { userAnswers: [], score: 0, currentQuestionIndex: 0 },
+                3: { userAnswers: [], score: 0, currentQuestionIndex: 0 },
+                4: { userAnswers: [], score: 0, currentQuestionIndex: 0 },
+                5: { userAnswers: [], score: 0, currentQuestionIndex: 0 },
+                6: { userAnswers: [], score: 0, currentQuestionIndex: 0 }
+            };
+            currentPart = 1;
+            switchPart(1); 
+        }
+        
+        function loadQuizView() {
+            quizView.classList.remove('hidden');
+            editView.classList.add('hidden');
+            practiceSheetView.classList.add('hidden');
+            allQuestionsView.classList.add('hidden');
+            
+            questionNavArea.classList.remove('hidden');
+            questionArea.classList.remove('hidden');
+            answerArea.classList.remove('hidden');
+            resultsArea.classList.add('hidden');
+
+            renderQuestionButtons();
+            showQuestion();
+            updateScoreText();
+        }
+
+        function renderQuestionButtons() {
+            questionNavArea.innerHTML = '';
+            quizData.forEach((question, index) => {
+                const button = document.createElement('button');
+                button.textContent = question.number;
+                button.classList.add('question-nav-btn', 'border-2', 'border-gray-300', 'rounded-md');
+                button.addEventListener('click', () => {
+                    quizState[currentPart].currentQuestionIndex = index;
+                    showQuestion();
+                });
+                questionNavArea.appendChild(button);
+            });
+        }
+        
+        function updateQuestionButtonStyles() {
+            const buttons = Array.from(questionNavArea.children);
+            buttons.forEach((button, index) => {
+                button.classList.remove('active', 'answered-correct', 'answered-incorrect');
+                if (quizState[currentPart].userAnswers[index]) {
+                    if(quizState[currentPart].userAnswers[index].isCorrect) {
+                        button.classList.add('answered-correct');
+                    } else {
+                        button.classList.add('answered-incorrect');
+                    }
+                }
+            });
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            if(buttons[currentQuestionIndex]) {
+                buttons[currentQuestionIndex].classList.add('active');
+            }
+        }
+
+        function showQuestion() {
+            resetState();
+            if (quizData.length === 0) {
+                if (currentPart === 6 && !questionTextEl.textContent.includes("Failed to load")){
+                     questionTextEl.innerHTML = `<a href="https://jingjork023-dev.github.io/med-semio-02/" target="_blank" class="text-blue-600 hover:underline">https://jingjork023-dev.github.io/med-semio-02/</a>`;
+                } else if (currentPart !== 6) {
+                    questionTextEl.innerHTML = "No questions in this part.";
+                }
+                questionNavArea.innerHTML = '';
+                answerArea.innerHTML = '';
+                nextBtn.classList.add('hidden');
+                prevBtn.classList.add('hidden');
+                questionNumberEl.innerHTML = `Question 0/0`;
+                return;
+            }
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            const userAnswers = quizState[currentPart].userAnswers;
+            const currentQuestion = quizData[currentQuestionIndex];
+            isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+
+            if (isAnswered) {
+                redoBtn.classList.remove('hidden');
+            }
+
+            questionNumberEl.innerHTML = `Question ${currentQuestion.number}/${quizData.length}`;
+            questionTextEl.innerHTML = `${currentQuestion.question.en}`;
+            
+            if (currentQuestion.type === 'mcq') {
+                answerArea.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+                currentQuestion.options.en.forEach((optionEn) => {
+                    const button = document.createElement('button');
+                    button.innerHTML = `<span>${optionEn}</span>`;
+                    button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'text-left', 'hover:bg-gray-100');
+                    button.addEventListener('click', () => selectAnswer(button, optionEn, currentQuestionIndex, answerArea, feedbackArea));
+
+                    if(isAnswered) {
+                        button.disabled = true;
+                        const userAnswerData = userAnswers[currentQuestionIndex];
+                        const correctAnswerEn = currentQuestion.answer.en;
+                        if (optionEn.trim() === correctAnswerEn.trim()){
+                            button.classList.add('correct');
+                        }
+                        if (optionEn.trim() === userAnswerData.answer.trim() && !userAnswerData.isCorrect){
+                            button.classList.add('incorrect');
+                        }
+                    }
+                    answerArea.appendChild(button);
+                });
+            } else if (currentQuestion.type === 'fill-in') {
+                answerArea.className = 'flex flex-col items-center gap-4 mt-4';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'fill-in-input';
+                input.className = 'w-full max-w-lg p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
+                input.placeholder = 'Type your answer here...';
+
+                const submitBtn = document.createElement('button');
+                submitBtn.textContent = 'Submit Answer';
+                submitBtn.className = 'bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-600 transition-colors duration-300 shadow-md';
+                submitBtn.addEventListener('click', () => checkFillInAnswer(input, currentQuestionIndex, answerArea, feedbackArea));
+
+                answerArea.appendChild(input);
+                answerArea.appendChild(submitBtn);
+
+                if (isAnswered) {
+                    const userAnswerData = userAnswers[currentQuestionIndex];
+                    input.value = userAnswerData.answer;
+                    input.disabled = true;
+                    submitBtn.disabled = true;
+                    input.classList.add(userAnswerData.isCorrect ? 'correct' : 'incorrect');
+                    if (!userAnswerData.isCorrect) {
+                        feedbackArea.innerHTML = `Wrong! The correct answer is: ${currentQuestion.answer.en}`;
+                        feedbackArea.className = 'mt-2 text-center text-md font-medium text-red-600';
+                    } else {
+                         feedbackArea.innerHTML = `Correct!`;
+                         feedbackArea.className = 'mt-2 text-center text-md font-medium text-green-600';
+                    }
+                }
+            }
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+        
+        function resetState() {
+            feedbackArea.textContent = '';
+            answerArea.innerHTML = '';
+            redoBtn.classList.add('hidden');
+        }
+
+        function updateButtonVisibility() {
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+            const allAnswered = quizState[currentPart].userAnswers.filter(Boolean).length === quizData.length;
+            nextBtn.classList.toggle('hidden', allAnswered);
+
+            if (currentQuestionIndex === quizData.length - 1 || allAnswered) {
+                 nextBtn.innerHTML = `<span class="font-semibold">Show Results</span>`;
+            } else {
+                 nextBtn.innerHTML = `<span class="font-semibold">Next Question</span>`;
+            }
+        }
+        
+        async function checkFillInAnswer(inputElement, questionIndex, container, feedbackEl) {
+             await startAudio();
+            if (quizState[currentPart].userAnswers[questionIndex]) return;
+
+            const userAnswer = inputElement.value;
+            const currentQuestion = quizData[questionIndex];
+            const isCorrect = userAnswer.trim().toLowerCase() === currentQuestion.answer.en.trim().toLowerCase();
+
+            inputElement.disabled = true;
+            container.querySelector('button').disabled = true;
+
+            if (isCorrect) {
+                quizState[currentPart].score++;
+                correctSynth.triggerAttackRelease("C5", "8n", Tone.now());
+                inputElement.classList.add('correct');
+                 if (feedbackEl) {
+                    feedbackEl.innerHTML = `Correct!`;
+                    feedbackEl.className = 'mt-2 text-center text-md font-medium text-green-600 practice-feedback';
+                }
+            } else {
+                const now = Tone.now();
+                incorrectSynth.triggerAttackRelease("G3", "16n", now);
+                incorrectSynth.triggerAttackRelease("F#3", "8n", now + 0.1);
+                inputElement.classList.add('incorrect');
+                 if (feedbackEl) {
+                    feedbackEl.innerHTML = `Wrong! The correct answer is: <strong>${currentQuestion.answer.en}</strong>`;
+                    feedbackEl.className = 'mt-2 text-center text-md font-medium text-red-600 practice-feedback';
+                }
+            }
+
+            quizState[currentPart].userAnswers[questionIndex] = { isCorrect, answer: userAnswer };
+            
+            if (!practiceSheetView.classList.contains('hidden')) {
+                const practiceRedoBtn = document.getElementById(`ps-redo-btn-${questionIndex}`);
+                if (practiceRedoBtn) practiceRedoBtn.classList.remove('hidden');
+            } else {
+                redoBtn.classList.remove('hidden');
+            }
+
+            updateScoreText();
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+
+
+        async function selectAnswer(button, selectedOptionEn, questionIndex, container, feedbackEl) {
+            await startAudio();
+            if (quizState[currentPart].userAnswers[questionIndex]) return;
+            
+            const allButtons = container.querySelectorAll('button');
+            allButtons.forEach(btn => { btn.disabled = true; });
+
+            const currentQuestion = quizData[questionIndex];
+            const isCorrect = selectedOptionEn.trim() === currentQuestion.answer.en.trim();
+            
+            if (isCorrect) {
+                quizState[currentPart].score++;
+                correctSynth.triggerAttackRelease("C5", "8n", Tone.now());
+                button.classList.add('correct');
+                if (feedbackEl) {
+                    feedbackEl.innerHTML = `Correct!`;
+                    feedbackEl.className = 'mt-2 text-center text-md font-medium text-green-600 practice-feedback';
+                }
+            } else {
+                const now = Tone.now();
+                incorrectSynth.triggerAttackRelease("G3", "16n", now);
+                incorrectSynth.triggerAttackRelease("F#3", "8n", now + 0.1);
+                button.classList.add('incorrect');
+                 if (feedbackEl) {
+                    feedbackEl.innerHTML = `Wrong! The correct answer is: ${currentQuestion.answer.en}`;
+                    feedbackEl.className = 'mt-2 text-center text-md font-medium text-red-600 practice-feedback';
+                }
+                allButtons.forEach(btn => {
+                    if (btn.children[0].textContent.trim() === currentQuestion.answer.en.trim()) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            
+            quizState[currentPart].userAnswers[questionIndex] = { isCorrect, answer: selectedOptionEn };
+
+            if (!practiceSheetView.classList.contains('hidden')) {
+                const practiceRedoBtn = document.getElementById(`ps-redo-btn-${questionIndex}`);
+                if (practiceRedoBtn) practiceRedoBtn.classList.remove('hidden');
+            } else {
+                redoBtn.classList.remove('hidden');
+            }
+
+            updateScoreText();
+            updateQuestionButtonStyles();
+            updateButtonVisibility();
+        }
+        
+        function togglePracticeSheetView() {
+            quizView.classList.toggle('hidden');
+            practiceSheetView.classList.toggle('hidden');
+            allQuestionsView.classList.add('hidden');
+
+            if (!practiceSheetView.classList.contains('hidden')) {
+                renderPracticeSheet();
+                practiceSheetBtn.textContent = 'Back to Quiz';
+            } else {
+                practiceSheetBtn.textContent = 'Practice Sheet';
+                loadQuizView(); // Reload single question view to reflect any changes
+            }
+        }
+
+        function toggleAllQuestionsView() {
+            quizView.classList.toggle('hidden');
+            allQuestionsView.classList.toggle('hidden');
+            practiceSheetView.classList.add('hidden');
+
+            if (!allQuestionsView.classList.contains('hidden')) {
+                renderAllQuestions();
+                showAllBtn.textContent = 'Back to Quiz';
+            } else {
+                showAllBtn.textContent = 'Show Answers';
+            }
+        }
+
+        function renderAllQuestions() {
+            allQuestionsView.innerHTML = ''; // Clear previous content
+
+            const title = document.createElement('h2');
+            title.className = 'text-3xl font-bold text-center mb-6 text-gray-800';
+            title.textContent = `All Questions & Answers - Part ${currentPart}`;
+            allQuestionsView.appendChild(title);
+
+            quizData.forEach(q => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'mb-6 p-4 border rounded-lg bg-gray-50';
+
+                let contentHTML = `<p class="font-bold text-lg mb-2">${q.number}. ${q.question.en}</p>`;
+
+                if (q.type === 'mcq') {
+                    contentHTML += '<ul class="list-disc list-inside space-y-1">';
+                    q.options.en.forEach(option => {
+                        const isCorrect = option.trim() === q.answer.en.trim();
+                        contentHTML += `<li class="${isCorrect ? 'text-green-700 font-semibold' : 'text-gray-700'}">${option}${isCorrect ? ' &check;' : ''}</li>`;
+                    });
+                    contentHTML += '</ul>';
+                } else if (q.type === 'fill-in') {
+                     contentHTML += `<p class="text-green-700 font-semibold">Answer: ${q.answer.en}</p>`;
+                }
+                questionDiv.innerHTML = contentHTML;
+                allQuestionsView.appendChild(questionDiv);
+            });
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg block mx-auto';
+            backBtn.innerHTML = '<span class="font-semibold">Back to Quiz</span>';
+            backBtn.addEventListener('click', toggleAllQuestionsView);
+            allQuestionsView.appendChild(backBtn);
+        }
+
+        function renderPracticeSheet() {
+            practiceSheetView.innerHTML = ''; 
+            const title = document.createElement('h2');
+            title.className = 'text-3xl font-bold text-center mb-6 text-gray-800';
+            title.textContent = `Practice Sheet - Part ${currentPart}`;
+            practiceSheetView.appendChild(title);
+
+            quizData.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.id = `ps-question-${index}`;
+                questionDiv.className = 'mb-6 p-4 border rounded-lg bg-gray-50';
+                
+                const questionHeader = document.createElement('div');
+                questionHeader.className = 'flex justify-between items-start';
+                
+                const questionTitle = document.createElement('p');
+                questionTitle.className = 'font-bold text-lg mb-2 flex-grow';
+                questionTitle.innerHTML = `${q.number}. ${q.question.en}`;
+                
+                const redoBtn = document.createElement('button');
+                redoBtn.id = `ps-redo-btn-${index}`;
+                redoBtn.textContent = 'Redo';
+                redoBtn.className = 'hidden bg-yellow-500 text-white font-bold py-1 px-4 rounded-lg hover:bg-yellow-600 text-sm';
+                redoBtn.addEventListener('click', () => redoPracticeSheetQuestion(index));
+                
+                questionHeader.appendChild(questionTitle);
+                questionHeader.appendChild(redoBtn);
+
+                const answersContainer = document.createElement('div');
+                const feedbackEl = document.createElement('div');
+                feedbackEl.className = 'practice-feedback';
+
+                questionDiv.appendChild(questionHeader);
+
+                if (q.type === 'mcq') {
+                    answersContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-3 mt-4';
+                    q.options.en.forEach(optionEn => {
+                        const button = document.createElement('button');
+                        button.innerHTML = `<span>${optionEn}</span>`;
+                        button.className = 'option-btn w-full p-3 border-2 border-gray-300 rounded-lg text-left hover:bg-gray-100';
+                        button.addEventListener('click', () => selectAnswer(button, optionEn, index, answersContainer, feedbackEl));
+                        answersContainer.appendChild(button);
+                    });
+                } else if (q.type === 'fill-in') {
+                    answersContainer.className = 'flex flex-col items-start gap-3 mt-4';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'w-full max-w-md p-2 border-2 border-gray-300 rounded-lg';
+                    const submitBtn = document.createElement('button');
+                    submitBtn.textContent = 'Submit';
+                    submitBtn.className = 'bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-600 text-sm';
+                    submitBtn.addEventListener('click', () => checkFillInAnswer(input, index, answersContainer, feedbackEl));
+                    answersContainer.appendChild(input);
+                    answersContainer.appendChild(submitBtn);
+                }
+
+                questionDiv.appendChild(answersContainer);
+                questionDiv.appendChild(feedbackEl);
+                practiceSheetView.appendChild(questionDiv);
+
+
+                if (quizState[currentPart].userAnswers[index]) {
+                    redoBtn.classList.remove('hidden');
+                    const userAnswerData = quizState[currentPart].userAnswers[index];
+                    if (q.type === 'mcq') {
+                        Array.from(answersContainer.children).forEach(button => {
+                            button.disabled = true;
+                            const optionText = button.textContent.trim();
+                             if (optionText === q.answer.en.trim()) button.classList.add('correct');
+                             if (optionText === userAnswerData.answer.trim() && !userAnswerData.isCorrect) button.classList.add('incorrect');
+                        });
+                    } else if (q.type === 'fill-in') {
+                        const input = answersContainer.querySelector('input');
+                        const submit = answersContainer.querySelector('button');
+                        input.value = userAnswerData.answer;
+                        input.disabled = true;
+                        submit.disabled = true;
+                        input.classList.add(userAnswerData.isCorrect ? 'correct' : 'incorrect');
+                    }
+                }
+            });
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-lg block mx-auto';
+            backBtn.innerHTML = '<span class="font-semibold">Back to Quiz</span>';
+            backBtn.addEventListener('click', togglePracticeSheetView);
+            practiceSheetView.appendChild(backBtn);
+        }
+
+        function redoPracticeSheetQuestion(questionIndex) {
+            const answerData = quizState[currentPart].userAnswers[questionIndex];
+            if (!answerData) return;
+
+            if (answerData.isCorrect) {
+                quizState[currentPart].score--;
+            }
+
+            quizState[currentPart].userAnswers[questionIndex] = undefined;
+            updateScoreText();
+            updateQuestionButtonStyles();
+
+            const questionContainer = document.getElementById(`ps-question-${questionIndex}`);
+            if (!questionContainer) return;
+
+            const question = quizData[questionIndex];
+            
+            if (question.type === 'mcq') {
+                const buttons = questionContainer.querySelectorAll('button.option-btn');
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('correct', 'incorrect');
+                });
+            } else if (question.type === 'fill-in') {
+                const input = questionContainer.querySelector('input');
+                const submit = questionContainer.querySelector('button');
+                input.disabled = false;
+                submit.disabled = false;
+                input.value = '';
+                input.classList.remove('correct', 'incorrect');
+            }
+
+            const feedbackEl = questionContainer.querySelector('.practice-feedback');
+            if (feedbackEl) feedbackEl.innerHTML = '';
+            
+            const redoButton = document.getElementById(`ps-redo-btn-${questionIndex}`);
+            if (redoButton) redoButton.classList.add('hidden');
+        }
+
+
+        function showResults() {
+            questionNavArea.classList.add('hidden');
+            questionArea.classList.add('hidden');
+            answerArea.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            prevBtn.classList.add('hidden');
+            redoBtn.classList.add('hidden');
+            feedbackArea.textContent = '';
+            resultsArea.classList.remove('hidden');
+            resultsScoreEl.innerHTML = `Your final score is ${quizState[currentPart].score} out of ${quizData.length}.`;
+            summaryEl.innerHTML = `<div class="text-center mb-4"><h3 class="text-xl font-bold text-gray-700">Review Your Answers:</h3></div>`; 
+            
+            quizState[currentPart].userAnswers.forEach((ua, index) => {
+                if (!ua) return;
+                const qData = quizData[index];
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('mb-4', 'p-3', 'rounded-md', ua.isCorrect ? 'bg-blue-100' : 'bg-red-100');
+                
+                const correctAnswerText = !ua.isCorrect ? `Correct answer: ${qData.answer.en}` : '';
+                resultDiv.innerHTML = `
+                    <p class="font-semibold">${qData.number}. ${qData.question.en}</p>
+                    <p class="text-sm ${ua.isCorrect ? 'text-blue-700' : 'text-red-700'}">Your answer: ${ua.answer}</p>
+                    <p class="text-sm text-gray-600">${correctAnswerText}</p>`;
+                
+                summaryEl.appendChild(resultDiv);
+            });
+        }
+        
+        function redoQuestion() {
+            const currentQuestionIndex = quizState[currentPart].currentQuestionIndex;
+            const answerData = quizState[currentPart].userAnswers[currentQuestionIndex];
+            if (!answerData) return;
+
+            if (answerData.isCorrect) {
+                quizState[currentPart].score--;
+            }
+            quizState[currentPart].userAnswers[currentQuestionIndex] = undefined;
+            
+            updateScoreText();
+            showQuestion();
+        }
+
+        function redoPart() {
+            quizState[currentPart] = { userAnswers: [], score: 0, currentQuestionIndex: 0 };
+            loadQuizView();
+        }
+
+        // --- EDIT MODE FUNCTIONS (Simplified for brevity) ---
+        
+        function toggleEditMode() {
+            quizView.classList.toggle('hidden');
+            editView.classList.toggle('hidden');
+            practiceSheetView.classList.add('hidden');
+            allQuestionsView.classList.add('hidden');
+            if (!editView.classList.contains('hidden')) {
+                renderEditView();
+            }
+            exportArea.classList.add('hidden');
+        }
+
+        function renderEditView() {
+            editQuestionsContainer.innerHTML = '';
+            editQuestionNavArea.innerHTML = '';
+            quizData.forEach((q, index) => {
+                const navButton = document.createElement('button');
+                navButton.textContent = q.number;
+                navButton.className = 'question-nav-btn border-2 border-gray-300 rounded-md';
+                navButton.addEventListener('click', () => document.getElementById(`edit-q-${index}`).scrollIntoView({ behavior: 'smooth' }));
+                editQuestionNavArea.appendChild(navButton);
+                
+                const qDiv = document.createElement('div');
+                qDiv.id = `edit-q-${index}`;
+                qDiv.className = 'border p-4 rounded-lg mb-4 bg-gray-50 scroll-mt-4';
+                const correctAnserIndex = q.type === 'mcq' ? q.options.en.map(o => o.trim()).indexOf(q.answer.en.trim()) : -1;
+
+                qDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-bold text-lg">Question ${q.number}</p>
+                        <button class="delete-question-btn bg-red-500 text-white font-bold py-1 px-3 rounded hover:bg-red-600" data-index="${index}">Delete</button>
+                    </div>
+                    <label class="edit-label">Question (English)</label>
+                    <textarea class="edit-input question-en">${q.type === 'mcq' ? q.question.en : q.title}</textarea>
+                    <div class="options-container mt-4">
+                    ${q.type === 'mcq' ?
+                        q.options.en.map((optEn, optIndex) => `
+                            <div class="flex items-center gap-2 mb-2">
+                                <input type="radio" name="correct-answer-${index}" ${optIndex === correctAnserIndex ? 'checked' : ''}>
+                                <input type="text" class="edit-input option-en" value="${optEn}">
+                            </div>
+                        `).join('') : ''
+                    }
+                    </div>
+                `;
+                editQuestionsContainer.appendChild(qDiv);
+            });
+
+            document.querySelectorAll('.delete-question-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                quizData.splice(parseInt(e.target.dataset.index, 10), 1);
+                renderEditView();
+            }));
+        }
+
+        function getEditedData() {
+            const newQuizData = [];
+            editQuestionsContainer.querySelectorAll('.border').forEach((form, index) => {
+                const q = { number: index + 1, type: 'mcq', question: { en: form.querySelector('.question-en').value } };
+                const optInputs = Array.from(form.querySelectorAll('.option-en'));
+                const radios = Array.from(form.querySelectorAll('input[type="radio"]'));
+                q.options = { en: optInputs.map(input => input.value) };
+                q.answer = { en: q.options.en[radios.findIndex(r => r.checked)] };
+                newQuizData.push(q);
+            });
+            return newQuizData;
+        }
+
+        function applyToPreview() {
+            const editedData = getEditedData();
+            if (currentPart === 1) quizDataPart1 = editedData;
+            else if (currentPart === 2) quizDataPart2 = editedData;
+            else if (currentPart === 3) quizDataPart3 = editedData;
+            else if (currentPart === 4) quizDataPart4 = editedData;
+            else if (currentPart === 5) quizDataPart5 = editedData;
+            else quizDataPart6 = editedData;
+            quizData = editedData;
+            toggleEditMode();
+            initializeQuiz();
+        }
+
+        function generateSaveCode() {
+            const data = getEditedData();
+            const varName = `quizDataPart${currentPart}`;
+            exportOutput.value = `let ${varName} = ${JSON.stringify(data, null, 4)};`;
+            exportArea.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        part1Btn.addEventListener('click', () => switchPart(1));
+        part2Btn.addEventListener('click', () => switchPart(2));
+        part3Btn.addEventListener('click', () => switchPart(3));
+        part4Btn.addEventListener('click', () => switchPart(4));
+        part5Btn.addEventListener('click', () => switchPart(5));
+        part6Btn.addEventListener('click', () => switchPart(6));
+        practiceSheetBtn.addEventListener('click', togglePracticeSheetView);
+        showAllBtn.addEventListener('click', toggleAllQuestionsView);
+        
+        prevBtn.addEventListener('click', () => {
+            if (quizState[currentPart].currentQuestionIndex > 0) {
+                quizState[currentPart].currentQuestionIndex--;
+                showQuestion();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            const allAnswered = quizState[currentPart].userAnswers.filter(Boolean).length === quizData.length;
+            if (quizState[currentPart].currentQuestionIndex < quizData.length - 1 && !allAnswered) {
+                quizState[currentPart].currentQuestionIndex++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        });
+        
+        restartBtn.addEventListener('click', startQuiz);
+        redoBtn.addEventListener('click', redoQuestion);
+        redoPartBtn.addEventListener('click', redoPart);
+        editQuizBtn.addEventListener('click', toggleEditMode);
+        applyPreviewBtn.addEventListener('click', applyToPreview);
+        generateSaveCodeBtn.addEventListener('click', generateSaveCode);
+        cancelEditBtn.addEventListener('click', toggleEditMode);
+        addQuestionBtn.addEventListener('click', () => {
+            quizData.push({ number: quizData.length + 1, type: 'mcq', question: { en: "New Question" }, options: { en: ["A", "B", "C", "D"] }, answer: { en: "A" } });
+            renderEditView();
+        });
+        exportOutput.addEventListener('click', () => {
+            exportOutput.select();
+            document.execCommand('copy');
+            copyFeedbackEl.textContent = 'Code copied!';
+            setTimeout(() => { copyFeedbackEl.textContent = '' }, 2000);
+        });
+
+        window.addEventListener('beforeunload', e => {
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
+        // Initial start
+        initializeQuiz();
+    </script>
+</body>
+</html>
+
+
